@@ -1,7 +1,7 @@
 -- Este arquivo contém os comandos SQL necessários para criar a estrutura do banco de dados
 -- Execute este arquivo após criar o banco de dados 'task_manager'
 
--- Criação da tabela de usuários (versão simplificada)
+-- Criação da tabela de usuários
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,    -- Identificador único auto-incrementado
     name VARCHAR(100) NOT NULL -- Nome do usuário (obrigatório)

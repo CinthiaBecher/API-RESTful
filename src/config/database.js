@@ -1,12 +1,14 @@
+require('dotenv').config();
 const { Pool } = require('pg');
 
 // Configuração do pool de conexões
 const pool = new Pool({
-  user: 'postgres',      // usuário do banco
-  host: 'localhost',     // host do banco
-  database: 'task_manager', // nome do banco
-  password: 'postgres',  // senha do banco
-  port: 5432,           // porta padrão do PostgreSQL
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
+  // Só inclui password se ele existir e não for vazio
+  ...(process.env.DB_PASSWORD && { password: process.env.DB_PASSWORD })
 });
 
 // Teste de conexão
