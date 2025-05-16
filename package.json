@@ -21,7 +21,8 @@
   "homepage": "https://github.com/CinthiaBecher/API-RESTful#readme",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.18.3"
+    "express": "^4.18.3",
+    "pg": "^8.16.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
