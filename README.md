@@ -51,20 +51,26 @@ npm install
      \q
      ```
 
+   - Crie as tabelas do banco de dados (escolha uma das opções):
+     ```bash
+     # Opção 1: Execute diretamente do terminal
+     psql -d task_manager -f config/init.sql
+     
+     # Opção 2: Execute dentro do psql
+     psql -d task_manager
+     \i config/init.sql
+     
+     # Para verificar se as tabelas foram criadas:
+     \dt
+     ```
+
 ## Executando o Projeto
 
-Para desenvolvimento:
-```bash
-npm run dev
-```
-
-Para produção:
 ```bash
 npm start
 ```
 
 O servidor estará rodando em `http://localhost:3000`
-
 
 ## Autores
 
