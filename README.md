@@ -7,14 +7,24 @@ Este projeto é uma API RESTful desenvolvida para a disciplina de Engenharia de 
 - Node.js
 - Express
 - PostgreSQL
-- Arquitetura em Camadas
+- Docker
+- Make
 
 ## Pré-requisitos
 
 Antes de começar, você precisa ter instalado:
-- Node.js (versão 14 ou superior)
-- PostgreSQL (versão 12 ou superior)
-- npm (gerenciador de pacotes do Node.js)
+- Docker
+- Make (já vem instalado no Mac, no Windows pode ser instalado via Chocolatey)
+
+### Instalação do Make no Windows
+1. Instale o Chocolatey (gerenciador de pacotes para Windows):
+   ```powershell
+   Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+   ```
+2. Instale o Make:
+   ```powershell
+   choco install make
+   ```
 
 ## Configuração do Ambiente
 
@@ -24,53 +34,64 @@ git clone https://github.com/CinthiaBecher/API-RESTful.git
 cd API-RESTful
 ```
 
-2. Instale as dependências:
-```bash
-npm install
-```
-
-3. Configure o PostgreSQL:
-   - Certifique-se que o PostgreSQL está instalado e rodando
-   - Para acessar o PostgreSQL:
-     ```bash
-     # Abra o Terminal e digite:
-     psql postgres
-     
-     # Se aparecer um erro, tente:
-     psql -U postgres
-     
-     # Se conseguir entrar, você verá algo como:
-     postgres=#
-     # Este prompt indica que você está dentro do terminal do PostgreSQL
-     # Dessa forma você pode executar comandos SQL diretamente
-     
-     # Agora crie o banco de dados:
-     CREATE DATABASE task_manager;
-     
-     # Para sair do psql, digite:
-     \q
-     ```
-
-   - Crie as tabelas do banco de dados (escolha uma das opções):
-     ```bash
-     # Opção 1: Execute diretamente do terminal
-     psql -d task_manager -f config/init.sql
-     
-     # Opção 2: Execute dentro do psql
-     psql -d task_manager
-     \i config/init.sql
-     
-     # Para verificar se as tabelas foram criadas:
-     \dt
-     ```
+2. Certifique-se que o Docker Desktop está rodando
 
 ## Executando o Projeto
 
+### Usando Make (Recomendado)
+
+O projeto inclui um Makefile com vários comandos úteis. Para ver todos os comandos disponíveis:
 ```bash
-npm start
+make help
 ```
 
-O servidor estará rodando em `http://localhost:3000`
+Para iniciar o projeto:
+```bash
+make run
+```
+
+Outros comandos úteis:
+- `make down` - Para todos os serviços
+- `make logs` - Mostra os logs de todos os serviços
+- `make db-reset` - Reseta o banco de dados (remove volume e executa migrations)
+- `make clean` - Remove containers, imagens e volumes não utilizados
+
+### Usando Docker Compose diretamente
+
+Se preferir não usar o Make, você pode usar os comandos do Docker Compose diretamente:
+
+```bash
+# Iniciar os serviços
+docker-compose up -d
+
+# Parar os serviços
+docker-compose down
+
+# Ver logs
+docker-compose logs -f
+```
+
+
+
+## Serviços
+
+O projeto utiliza três serviços Docker:
+
+1. **PostgreSQL** (`postgres`):
+   - Banco de dados principal
+   - Porta: 5432
+   - Credenciais padrão: postgres/postgres
+
+2. **Migrations** (`migrations`):
+   - Executa as migrations do banco de dados
+   - Roda apenas uma vez durante a inicialização
+
+3. **API** (`api`):
+   - Servidor Node.js
+   - Porta: 3000
+   - Hot-reload ativado para desenvolvimento
+
+
 
 ## Autores
 

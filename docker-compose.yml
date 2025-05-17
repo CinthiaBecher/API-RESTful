@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: api_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: api_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - api_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migrations:
+    image: alpine:latest
+    container_name: api_migrations
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./src/config/init.sql:/init.sql
+      - ./src/config/run-migrations.sh:/run-migrations.sh
+    command: >
+      sh -c "apk add --no-cache postgresql-client &&
+             chmod +x /run-migrations.sh &&
+             /run-migrations.sh"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: api_db
+    networks:
+      - api_network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api_service
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+    environment:
+      - NODE_ENV=development
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=api_db
+      - PORT=3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - api_network
+
+volumes:
+  postgres_data:
+
+networks:
+  api_network:
+    driver: bridge 
