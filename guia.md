@@ -89,3 +89,80 @@ curl -X PUT http://localhost:3000/users/1 \
 ```bash
 curl -X DELETE http://localhost:3000/users/1
 ```
+
+## Fluxo de uma requisição
+
+### Entrada da Requisição
+```bash
+curl -X POST http://localhost:3000/tasks \
+-H "Content-Type: application/json" \
+-d '{
+  "title": "Implementar autenticação",
+  "description": "Adicionar sistema de login",
+  "status": "pendente"
+}'
+```
+
+### Processo em Camadas
+1) Camada de Rotas (routes/taskRoutes.js) recebe a requisição HTTP
+```javascript
+router.post('/tasks', TaskController.create);
+```
+Define os endpoints da API e mapeia URLs para os controllers apropriados
+
+2) Camada de Controllers (controllers/TaskController.js) recebe os dados da requisição
+
+```javascript
+const task = await TaskService.create(req.body);
+```
+Recebe dados da requisição e chamar o serviço apropriado
+
+3) Camada de Services (services/TaskService.js) faz a validação de negócio e chama o repositória para criar a tarefa
+```javascript
+// Validação de negócio
+  if (!title) {
+    throw new Error('Título é obrigatório');
+  }
+
+  const validStatuses = ['pendente', 'em_andamento', 'concluida'];
+  if (!validStatuses.includes(status)) {
+    throw new Error('Status inválido');
+  }
+
+  // Chama o repository para criar a tarefa
+  return await this.taskRepository.create({ 
+    title, 
+    description, 
+    status 
+  });
+```
+Implementa regras de negócio validando os dados e aplicando as regras. Chama o repositóry
+
+4) Camada de Repositories (repositories/TaskRepository.js) executa a operação no banco de dados e converte o resultado para um objeto Task
+
+```javascript
+async create({ title, description, status }) {
+  const query = `
+    INSERT INTO tasks (title, description, status)
+    VALUES ($1, $2, $3)
+    RETURNING *
+  `;
+  
+  try {
+    // 5. Executa a operação no banco de dados
+    const result = await db.query(query, [title, description, status]);
+    // 5.1. Converte o resultado para um objeto Task
+    return Task.fromDatabase(result.rows[0]);
+  } catch (error) {
+    throw error;
+  }
+}
+```
+
+6) Camada de Controllers (controllers/TaskController.js) envia a resposta HTTP
+```javascript
+    return res.status(201).json(task);
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+```
