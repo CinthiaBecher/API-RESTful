@@ -8,14 +8,17 @@ class TaskController {
       
       if (assignedTo) {
         const tasks = await TaskService.findByUserId(assignedTo);
-        return res.json(tasks);
+        return res.status(200).json(tasks);
       }
 
       const tasks = await TaskService.findAll();
-      return res.json(tasks);
+      return res.status(200).json(tasks);
     } catch (error) {
       if (error.message === 'Usuário não encontrado') {
         return res.status(404).json({ error: error.message });
+      }
+      if (error.message.includes('obrigatório')) {
+        return res.status(422).json({ error: error.message });
       }
       return res.status(400).json({ error: error.message });
     }
@@ -27,6 +30,12 @@ class TaskController {
       const task = await TaskService.create(req.body);
       return res.status(201).json(task);
     } catch (error) {
+      if (error.message.includes('obrigatório')) {
+        return res.status(422).json({ error: error.message });
+      }
+      if (error.message === 'Usuário não encontrado') {
+        return res.status(404).json({ error: error.message });
+      }
       return res.status(400).json({ error: error.message });
     }
   }
@@ -36,7 +45,7 @@ class TaskController {
     try {
       const { id } = req.params;
       const task = await TaskService.findById(id);
-      return res.json(task);
+      return res.status(200).json(task);
     } catch (error) {
       if (error.message === 'Tarefa não encontrada') {
         return res.status(404).json({ error: error.message });
@@ -50,10 +59,13 @@ class TaskController {
     try {
       const { id } = req.params;
       const task = await TaskService.update(id, req.body);
-      return res.json(task);
+      return res.status(200).json(task);
     } catch (error) {
       if (error.message === 'Tarefa não encontrada') {
         return res.status(404).json({ error: error.message });
+      }
+      if (error.message.includes('obrigatório')) {
+        return res.status(422).json({ error: error.message });
       }
       return res.status(400).json({ error: error.message });
     }

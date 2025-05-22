@@ -5,7 +5,7 @@ class UserController {
   async index(req, res) {
     try {
       const users = await UserService.findAll();
-      return res.json(users);
+      return res.status(200).json(users);
     } catch (error) {
       return res.status(400).json({ error: error.message });
     }
@@ -17,6 +17,9 @@ class UserController {
       const user = await UserService.create(req.body);
       return res.status(201).json(user);
     } catch (error) {
+      if (error.message.includes('obrigatório')) {
+        return res.status(422).json({ error: error.message });
+      }
       return res.status(400).json({ error: error.message });
     }
   }
@@ -26,7 +29,7 @@ class UserController {
     try {
       const { id } = req.params;
       const user = await UserService.findById(id);
-      return res.json(user);
+      return res.status(200).json(user);
     } catch (error) {
       if (error.message === 'Usuário não encontrado') {
         return res.status(404).json({ error: error.message });
@@ -40,10 +43,13 @@ class UserController {
     try {
       const { id } = req.params;
       const user = await UserService.update(id, req.body);
-      return res.json(user);
+      return res.status(200).json(user);
     } catch (error) {
       if (error.message === 'Usuário não encontrado') {
         return res.status(404).json({ error: error.message });
+      }
+      if (error.message.includes('obrigatório')) {
+        return res.status(422).json({ error: error.message });
       }
       return res.status(400).json({ error: error.message });
     }
