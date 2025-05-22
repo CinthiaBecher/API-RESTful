@@ -4,9 +4,19 @@ class TaskController {
   // Listar todas as tarefas
   async index(req, res) {
     try {
+      const { assignedTo } = req.query;
+      
+      if (assignedTo) {
+        const tasks = await TaskService.findByUserId(assignedTo);
+        return res.json(tasks);
+      }
+
       const tasks = await TaskService.findAll();
       return res.json(tasks);
     } catch (error) {
+      if (error.message === 'Usuário não encontrado') {
+        return res.status(404).json({ error: error.message });
+      }
       return res.status(400).json({ error: error.message });
     }
   }

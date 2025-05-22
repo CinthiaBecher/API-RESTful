@@ -4,7 +4,7 @@ const Task = require('../models/Task');
 class TaskRepository {
   async findAll() {
     const query = `
-      SELECT id, title, description, status
+      SELECT id, title, description, status, user_id
       FROM tasks
     `;
     
@@ -16,15 +16,30 @@ class TaskRepository {
     }
   }
 
-  async create({ title, description, status }) {
+  async findByUserId(userId) {
     const query = `
-      INSERT INTO tasks (title, description, status)
-      VALUES ($1, $2, $3)
+      SELECT id, title, description, status, user_id
+      FROM tasks
+      WHERE user_id = $1
+    `;
+    
+    try {
+      const result = await db.query(query, [userId]);
+      return result.rows.map(row => Task.fromDatabase(row));
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async create({ title, description, status, user_id }) {
+    const query = `
+      INSERT INTO tasks (title, description, status, user_id)
+      VALUES ($1, $2, $3, $4)
       RETURNING *
     `;
     
     try {
-      const result = await db.query(query, [title, description, status]);
+      const result = await db.query(query, [title, description, status, user_id]);
       return Task.fromDatabase(result.rows[0]);
     } catch (error) {
       throw error;
@@ -33,7 +48,7 @@ class TaskRepository {
 
   async findById(id) {
     const query = `
-      SELECT id, title, description, status
+      SELECT id, title, description, status, user_id
       FROM tasks
       WHERE id = $1
     `;
@@ -46,16 +61,16 @@ class TaskRepository {
     }
   }
 
-  async update(id, { title, description, status }) {
+  async update(id, { title, description, status, user_id }) {
     const query = `
       UPDATE tasks
-      SET title = $1, description = $2, status = $3
-      WHERE id = $4
+      SET title = $1, description = $2, status = $3, user_id = $4
+      WHERE id = $5
       RETURNING *
     `;
     
     try {
-      const result = await db.query(query, [title, description, status, id]);
+      const result = await db.query(query, [title, description, status, user_id, id]);
       return result.rows[0] ? Task.fromDatabase(result.rows[0]) : null;
     } catch (error) {
       throw error;

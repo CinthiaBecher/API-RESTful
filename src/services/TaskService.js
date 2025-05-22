@@ -1,17 +1,43 @@
 const TaskRepository = require('../repositories/TaskRepository');
+const UserRepository = require('../repositories/UserRepository');
 
 class TaskService {
   constructor() {
     this.taskRepository = new TaskRepository();
+    this.userRepository = new UserRepository();
   }
 
   async findAll() {
     return await this.taskRepository.findAll();
   }
 
-  async create({ title, description, status = 'pendente' }) {
+  async findByUserId(userId) {
+    if (!userId) {
+      throw new Error('ID do usuário é obrigatório');
+    }
+
+    // Verificar se o usuário existe antes de buscar suas tarefas
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new Error('Usuário não encontrado');
+    }
+
+    return await this.taskRepository.findByUserId(userId);
+  }
+
+  async create({ title, description, status = 'pendente', user_id }) {
     if (!title) {
       throw new Error('Título é obrigatório');
+    }
+
+    if (!user_id) {
+      throw new Error('ID do usuário é obrigatório');
+    }
+
+    // Verificar se o usuário existe
+    const user = await this.userRepository.findById(user_id);
+    if (!user) {
+      throw new Error('Usuário não encontrado');
     }
 
     const validStatuses = ['pendente', 'em_andamento', 'concluida'];
@@ -19,7 +45,7 @@ class TaskService {
       throw new Error('Status inválido. Use: pendente, em_andamento ou concluida');
     }
 
-    return await this.taskRepository.create({ title, description, status });
+    return await this.taskRepository.create({ title, description, status, user_id });
   }
 
   async findById(id) {
