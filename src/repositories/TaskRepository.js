@@ -1,28 +1,8 @@
 const db = require('../config/database');
+const Task = require('../models/Task');
 
-class Task {
-  constructor({ id, title, description, status }) {
-    this.id = id;
-    this.title = title;
-    this.description = description;
-    this.status = status;
-  }
-
-  isValid() {
-    return this.title && this.title.length > 0;
-  }
-
-  static fromDatabase(row) {
-    return new Task({
-      id: row.id,
-      title: row.title,
-      description: row.description,
-      status: row.status
-    });
-  }
-
-  // Listar todas as tarefas
-  static async findAll() {
+class TaskRepository {
+  async findAll() {
     const query = `
       SELECT id, title, description, status
       FROM tasks
@@ -30,14 +10,13 @@ class Task {
     
     try {
       const result = await db.query(query);
-      return result.rows;
+      return result.rows.map(row => Task.fromDatabase(row));
     } catch (error) {
       throw error;
     }
   }
 
-  // Criar uma nova tarefa
-  static async create({ title, description, status }) {
+  async create({ title, description, status }) {
     const query = `
       INSERT INTO tasks (title, description, status)
       VALUES ($1, $2, $3)
@@ -46,14 +25,13 @@ class Task {
     
     try {
       const result = await db.query(query, [title, description, status]);
-      return result.rows[0];
+      return Task.fromDatabase(result.rows[0]);
     } catch (error) {
       throw error;
     }
   }
 
-  // Buscar tarefa por ID
-  static async findById(id) {
+  async findById(id) {
     const query = `
       SELECT id, title, description, status
       FROM tasks
@@ -62,14 +40,13 @@ class Task {
     
     try {
       const result = await db.query(query, [id]);
-      return result.rows[0];
+      return result.rows[0] ? Task.fromDatabase(result.rows[0]) : null;
     } catch (error) {
       throw error;
     }
   }
 
-  // Atualizar tarefa
-  static async update(id, { title, description, status }) {
+  async update(id, { title, description, status }) {
     const query = `
       UPDATE tasks
       SET title = $1, description = $2, status = $3
@@ -79,14 +56,13 @@ class Task {
     
     try {
       const result = await db.query(query, [title, description, status, id]);
-      return result.rows[0];
+      return result.rows[0] ? Task.fromDatabase(result.rows[0]) : null;
     } catch (error) {
       throw error;
     }
   }
 
-  // Deletar tarefa
-  static async delete(id) {
+  async delete(id) {
     const query = `
       DELETE FROM tasks
       WHERE id = $1
@@ -95,11 +71,11 @@ class Task {
     
     try {
       const result = await db.query(query, [id]);
-      return result.rows[0];
+      return result.rows[0] ? Task.fromDatabase(result.rows[0]) : null;
     } catch (error) {
       throw error;
     }
   }
 }
 
-module.exports = Task; 
+module.exports = TaskRepository; 

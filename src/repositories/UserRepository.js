@@ -1,24 +1,8 @@
 const db = require('../config/database');
+const User = require('../models/User');
 
-class User {
-  constructor({ id, name }) {
-    this.id = id;
-    this.name = name;
-  }
-
-  isValid() {
-    return this.name && this.name.length > 0;
-  }
-
-  static fromDatabase(row) {
-    return new User({
-      id: row.id,
-      name: row.name
-    });
-  }
-
-  // Listar todos os usuários
-  static async findAll() {
+class UserRepository {
+  async findAll() {
     const query = `
       SELECT id, name
       FROM users
@@ -26,14 +10,13 @@ class User {
     
     try {
       const result = await db.query(query);
-      return result.rows;
+      return result.rows.map(row => User.fromDatabase(row));
     } catch (error) {
       throw error;
     }
   }
 
-  // Criar um novo usuário
-  static async create({ name }) {
+  async create({ name }) {
     const query = `
       INSERT INTO users (name)
       VALUES ($1)
@@ -42,14 +25,13 @@ class User {
     
     try {
       const result = await db.query(query, [name]);
-      return result.rows[0];
+      return User.fromDatabase(result.rows[0]);
     } catch (error) {
       throw error;
     }
   }
 
-  // Buscar usuário por ID
-  static async findById(id) {
+  async findById(id) {
     const query = `
       SELECT id, name
       FROM users
@@ -58,14 +40,13 @@ class User {
     
     try {
       const result = await db.query(query, [id]);
-      return result.rows[0];
+      return result.rows[0] ? User.fromDatabase(result.rows[0]) : null;
     } catch (error) {
       throw error;
     }
   }
 
-  // Atualizar usuário
-  static async update(id, { name }) {
+  async update(id, { name }) {
     const query = `
       UPDATE users
       SET name = $1
@@ -75,14 +56,13 @@ class User {
     
     try {
       const result = await db.query(query, [name, id]);
-      return result.rows[0];
+      return result.rows[0] ? User.fromDatabase(result.rows[0]) : null;
     } catch (error) {
       throw error;
     }
   }
 
-  // Deletar usuário
-  static async delete(id) {
+  async delete(id) {
     const query = `
       DELETE FROM users
       WHERE id = $1
@@ -91,11 +71,11 @@ class User {
     
     try {
       const result = await db.query(query, [id]);
-      return result.rows[0];
+      return result.rows[0] ? User.fromDatabase(result.rows[0]) : null;
     } catch (error) {
       throw error;
     }
   }
 }
 
-module.exports = User; 
+module.exports = UserRepository; 

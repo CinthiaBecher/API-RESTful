@@ -1,10 +1,10 @@
-const User = require('../models/User');
+const UserService = require('../services/UserService');
 
 class UserController {
   // Listar todos os usuários
   async index(req, res) {
     try {
-      const users = await User.findAll();
+      const users = await UserService.findAll();
       return res.json(users);
     } catch (error) {
       return res.status(400).json({ error: error.message });
@@ -14,13 +14,7 @@ class UserController {
   // Criar usuário
   async create(req, res) {
     try {
-      const { name } = req.body;
-      
-      if (!name) {
-        return res.status(400).json({ error: 'Nome é obrigatório' });
-      }
-
-      const user = await User.create({ name });
+      const user = await UserService.create(req.body);
       return res.status(201).json(user);
     } catch (error) {
       return res.status(400).json({ error: error.message });
@@ -31,14 +25,12 @@ class UserController {
   async findById(req, res) {
     try {
       const { id } = req.params;
-      const user = await User.findById(id);
-
-      if (!user) {
-        return res.status(404).json({ error: 'Usuário não encontrado' });
-      }
-
+      const user = await UserService.findById(id);
       return res.json(user);
     } catch (error) {
+      if (error.message === 'Usuário não encontrado') {
+        return res.status(404).json({ error: error.message });
+      }
       return res.status(400).json({ error: error.message });
     }
   }
@@ -47,20 +39,12 @@ class UserController {
   async update(req, res) {
     try {
       const { id } = req.params;
-      const { name } = req.body;
-
-      if (!name) {
-        return res.status(400).json({ error: 'Nome é obrigatório' });
-      }
-
-      const user = await User.update(id, { name });
-
-      if (!user) {
-        return res.status(404).json({ error: 'Usuário não encontrado' });
-      }
-
+      const user = await UserService.update(id, req.body);
       return res.json(user);
     } catch (error) {
+      if (error.message === 'Usuário não encontrado') {
+        return res.status(404).json({ error: error.message });
+      }
       return res.status(400).json({ error: error.message });
     }
   }
@@ -69,14 +53,12 @@ class UserController {
   async delete(req, res) {
     try {
       const { id } = req.params;
-      const user = await User.delete(id);
-
-      if (!user) {
-        return res.status(404).json({ error: 'Usuário não encontrado' });
-      }
-
+      await UserService.delete(id);
       return res.status(204).send();
     } catch (error) {
+      if (error.message === 'Usuário não encontrado') {
+        return res.status(404).json({ error: error.message });
+      }
       return res.status(400).json({ error: error.message });
     }
   }
