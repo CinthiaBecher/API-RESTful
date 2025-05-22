@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const db = require('./config/database');
 const userRoutes = require('./routes/userRoutes');
+const taskRoutes = require('./routes/taskRoutes');
 
 const app = express();
 
@@ -11,7 +12,8 @@ app.use(cors());
 app.use(express.json());
 
 // Rotas
-app.use('/', userRoutes);
+app.use(userRoutes);
+app.use(taskRoutes);
 
 // Rota básica para teste
 app.get('/', (req, res) => {
