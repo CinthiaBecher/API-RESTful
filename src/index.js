@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const db = require('./config/database');
 const userRoutes = require('./routes/userRoutes');
 const taskRoutes = require('./routes/taskRoutes');
 
@@ -19,6 +18,7 @@ app.use(taskRoutes);
 app.get('/', (req, res) => {
   res.json({ message: 'API de Gestão de Tarefas Colaborativas' });
 });
+
 
 // Configuração da porta
 const PORT = process.env.PORT || 3000;

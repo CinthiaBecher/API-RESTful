@@ -1,7 +1,13 @@
+// UserController.js
+// Recebe as requisições HTTP, chama os serviços (Services) e retorna as respostas apropriadas.
+// Aqui também são definidos os status HTTP e o tratamento de erros.
+
 const UserService = require('../services/UserService');
 
 class UserController {
-  // Listar todos os usuários
+  // [GET] /users
+  // Lista todos os usuários cadastrados.
+  // Utiliza status 200 para sucesso e 400 para outros erros.
   async index(req, res) {
     try {
       const users = await UserService.findAll();
@@ -11,7 +17,9 @@ class UserController {
     }
   }
 
-  // Criar usuário
+  // [POST] /users
+  // Cria um novo usuário. Espera receber os dados no corpo da requisição (JSON).
+  // Retorna 201 para sucesso, 422 para erros de validação e 400 para outros erros.
   async create(req, res) {
     try {
       const user = await UserService.create(req.body);
@@ -24,7 +32,8 @@ class UserController {
     }
   }
 
-  // Buscar usuário por ID
+  // [GET] /users/:id
+  // Busca um usuário pelo ID. Retorna 200 para sucesso, 404 se não encontrar e 400 para outros erros.
   async findById(req, res) {
     try {
       const { id } = req.params;
@@ -38,7 +47,9 @@ class UserController {
     }
   }
 
-  // Atualizar usuário
+  // [PUT] /users/:id
+  // Atualiza um usuário existente pelo ID. Espera os dados no corpo da requisição.
+  // Retorna 200 para sucesso, 404 se não encontrar, 422 para erros de validação e 400 para outros erros.
   async update(req, res) {
     try {
       const { id } = req.params;
@@ -55,7 +66,8 @@ class UserController {
     }
   }
 
-  // Deletar usuário
+  // [DELETE] /users/:id
+  // Remove um usuário pelo ID. Retorna 204 para sucesso (sem conteúdo), 404 se não encontrar e 400 para outros erros.
   async delete(req, res) {
     try {
       const { id } = req.params;
@@ -70,4 +82,5 @@ class UserController {
   }
 }
 
+// Exporta uma instância do controller para ser usada nas rotas
 module.exports = new UserController(); 
