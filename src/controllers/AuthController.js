@@ -5,11 +5,12 @@ class AuthController {
     try {
       const { username, password } = req.body;
 
-      const user = await AuthService.login(username, password);
+      const { user, token } = await AuthService.login(username, password);
       
       return res.status(200).json({
         message: 'Login realizado com sucesso',
-        user
+        user,
+        token
       });
     } catch (error) {
       if (error.message === 'Usuário não encontrado') {

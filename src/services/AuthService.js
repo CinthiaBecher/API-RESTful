@@ -1,5 +1,7 @@
 const UserService = require('./UserService');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const jwtConfig = require('../config/jwt');
 
 class AuthService {
   constructor() {
@@ -20,9 +22,19 @@ class AuthService {
       throw new Error('Senha incorreta');
     }
 
-    // Retornar usuário sem a senha
+    // Gerar token JWT
+    const token = jwt.sign(
+      { id: user.id, username: user.username },
+      jwtConfig.secret,
+      { expiresIn: jwtConfig.expiresIn }
+    );
+
+    // Retornar usuário sem a senha e o token
     const { password: _, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    return {
+      user: userWithoutPassword,
+      token
+    };
   }
 }
 
