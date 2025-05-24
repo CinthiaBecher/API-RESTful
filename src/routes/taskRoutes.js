@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const TaskController = require('../controllers/TaskController');
+const authMiddleware = require('../middlewares/auth');
 
 // Rotas de tarefa
-router.get('/tasks', TaskController.index); 
-router.post('/tasks', TaskController.create); 
-router.get('/tasks/:id', TaskController.findById);
-router.put('/tasks/:id', TaskController.update);
-router.delete('/tasks/:id', TaskController.delete);
+router.get('/tasks', authMiddleware, TaskController.index); 
+router.post('/tasks', authMiddleware, TaskController.create); 
+router.get('/tasks/:id', authMiddleware, TaskController.findById);
+router.put('/tasks/:id', authMiddleware, TaskController.update);
+router.delete('/tasks/:id', authMiddleware, TaskController.delete);
 
 module.exports = router; 
