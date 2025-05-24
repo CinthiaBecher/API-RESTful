@@ -69,7 +69,11 @@ curl http://localhost:3000/users
 ```bash
 curl -X POST http://localhost:3000/users \
   -H "Content-Type: application/json" \
-  -d '{"name": "João Silva"}'
+  -d '{
+    "name": "Usuário Teste",
+    "username": "teste",
+    "password": "123456"
+  }'
 ```
 Obs.: se acessar o http://localhost:3000/users no browser vai ver o [{"id":1,"name":"João Silva"}], e se acessar o DBeaver vai ver essa informacao lá (pode dar um refresh se precisar)
 
@@ -88,6 +92,17 @@ curl -X PUT http://localhost:3000/users/1 \
 #### Deletar Usuário
 ```bash
 curl -X DELETE http://localhost:3000/users/1
+```
+
+### Fazer login
+- Lembre-se de criar um usuario
+```bash
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "teste",
+    "password": "123456"
+  }'
 ```
 
 ## Fluxo de uma requisição

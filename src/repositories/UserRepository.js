@@ -4,7 +4,7 @@ const User = require('../models/User');
 class UserRepository {
   async findAll() {
     const query = `
-      SELECT id, name
+      SELECT id, name, username
       FROM users
     `;
     
@@ -16,15 +16,15 @@ class UserRepository {
     }
   }
 
-  async create({ name }) {
+  async create({ name, username, password }) {
     const query = `
-      INSERT INTO users (name)
-      VALUES ($1)
-      RETURNING *
+      INSERT INTO users (name, username, password)
+      VALUES ($1, $2, $3)
+      RETURNING id, name, username
     `;
     
     try {
-      const result = await db.query(query, [name]);
+      const result = await db.query(query, [name, username, password]);
       return User.fromDatabase(result.rows[0]);
     } catch (error) {
       throw error;
@@ -33,7 +33,7 @@ class UserRepository {
 
   async findById(id) {
     const query = `
-      SELECT id, name
+      SELECT id, name, username
       FROM users
       WHERE id = $1
     `;
@@ -46,16 +46,31 @@ class UserRepository {
     }
   }
 
-  async update(id, { name }) {
+  async findByUsername(username) {
     const query = `
-      UPDATE users
-      SET name = $1
-      WHERE id = $2
-      RETURNING *
+      SELECT id, name, username, password
+      FROM users
+      WHERE username = $1
     `;
     
     try {
-      const result = await db.query(query, [name, id]);
+      const result = await db.query(query, [username]);
+      return result.rows[0] ? User.fromDatabase(result.rows[0]) : null;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async update(id, { name, username, password }) {
+    const query = `
+      UPDATE users
+      SET name = $1, username = $2, password = $3
+      WHERE id = $4
+      RETURNING id, name, username
+    `;
+    
+    try {
+      const result = await db.query(query, [name, username, password, id]);
       return result.rows[0] ? User.fromDatabase(result.rows[0]) : null;
     } catch (error) {
       throw error;
@@ -66,7 +81,7 @@ class UserRepository {
     const query = `
       DELETE FROM users
       WHERE id = $1
-      RETURNING *
+      RETURNING id, name, username
     `;
     
     try {

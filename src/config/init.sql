@@ -1,7 +1,9 @@
 -- Criação da tabela de usuários
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,    -- Identificador único auto-incrementado
-    name VARCHAR(100) NOT NULL -- Nome do usuário (obrigatório)
+    name VARCHAR(100) NOT NULL, -- Nome do usuário (obrigatório)
+    username VARCHAR(50) NOT NULL UNIQUE, -- Nome de usuário único para login
+    password VARCHAR(255) NOT NULL -- Senha criptografada
 );
 
 -- Criação da tabela de tarefas
