@@ -1,4 +1,5 @@
 const UserService = require('./UserService');
+const bcrypt = require('bcrypt');
 
 class AuthService {
   constructor() {
@@ -13,8 +14,9 @@ class AuthService {
     // Buscar usuário pelo username
     const user = await this.userService.findByUsername(username);
     
-    // Verificar se a senha está correta
-    if (user.password !== password) {
+    // Verificar se a senha está correta usando bcrypt
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
       throw new Error('Senha incorreta');
     }
 

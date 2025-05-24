@@ -1,4 +1,5 @@
 const UserRepository = require('../repositories/UserRepository');
+const bcrypt = require('bcrypt');
 
 class UserService {
   constructor() {
@@ -32,7 +33,11 @@ class UserService {
       throw new Error('Username já está em uso');
     }
 
-    return await this.userRepository.create({ name, username, password });
+    // Criptografar a senha
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    return await this.userRepository.create({ name, username, password: hashedPassword });
   }
 
   async findById(id) {
@@ -83,7 +88,11 @@ class UserService {
       }
     }
 
-    return await this.userRepository.update(id, { name, username, password });
+    // Criptografar a nova senha
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    return await this.userRepository.update(id, { name, username, password: hashedPassword });
   }
 
   async delete(id) {
