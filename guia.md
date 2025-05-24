@@ -181,3 +181,159 @@ async create({ title, description, status }) {
     return res.status(400).json({ error: error.message });
   }
 ```
+
+## 4. Autenticação JWT
+
+### 4.1 Testando no Terminal
+
+#### Criar um usuário
+```bash
+curl -X POST http://localhost:3000/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Usuário Teste",
+    "username": "teste",
+    "password": "123456"
+  }'
+```
+
+#### Fazer login (obter token)
+```bash
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "teste",
+    "password": "123456"
+  }'
+```
+A resposta incluirá um token JWT. Guarde-o para usar nas próximas requisições.
+
+#### Exemplos de uso do token
+
+**Listar usuários:**
+```bash
+curl -X GET http://localhost:3000/users \
+  -H "Authorization: Bearer seu_token_aqui"
+```
+
+**Criar uma tarefa:**
+```bash
+curl -X POST http://localhost:3000/tasks \
+  -H "Authorization: Bearer seu_token_aqui" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Minha tarefa",
+    "description": "Descrição da tarefa",
+    "status": "pendente",
+    "user_id": 1
+  }'
+```
+
+**Buscar tarefas de um usuário específico:**
+```bash
+curl -X GET "http://localhost:3000/tasks?assignedTo=1" \
+  -H "Authorization: Bearer seu_token_aqui"
+```
+
+### 4.2 Testando no Postman
+
+#### Criar um usuário
+- Método: POST
+- URL: `http://localhost:3000/users`
+- Headers:
+  - Key: `Content-Type`
+  - Value: `application/json`
+- Body (raw JSON):
+```json
+{
+    "name": "Usuário Teste",
+    "username": "teste",
+    "password": "123456"
+}
+```
+
+#### Fazer login
+- Método: POST
+- URL: `http://localhost:3000/auth/login`
+- Headers:
+  - Key: `Content-Type`
+  - Value: `application/json`
+- Body (raw JSON):
+```json
+{
+    "username": "teste",
+    "password": "123456"
+}
+```
+A resposta incluirá um token JWT. Copie-o para usar nas próximas requisições.
+
+#### Exemplos de requisições autenticadas
+
+**Listar usuários:**
+- Método: GET
+- URL: `http://localhost:3000/users`
+- Headers:
+  - Key: `Authorization`
+  - Value: `Bearer seu_token_aqui` (substitua "seu_token_aqui" pelo token recebido no login)
+
+**Criar uma tarefa:**
+- Método: POST
+- URL: `http://localhost:3000/tasks`
+- Headers:
+  - Key: `Authorization`
+  - Value: `Bearer seu_token_aqui` (substitua "seu_token_aqui" pelo token recebido no login)
+  - Key: `Content-Type`
+  - Value: `application/json`
+- Body (raw JSON):
+```json
+{
+    "title": "Minha tarefa",
+    "description": "Descrição da tarefa",
+    "status": "pendente",
+    "user_id": 1
+}
+```
+
+**Buscar tarefas de um usuário:**
+- Método: GET
+- URL: `http://localhost:3000/tasks?assignedTo=1`
+- Headers:
+  - Key: `Authorization`
+  - Value: `Bearer seu_token_aqui` (substitua "seu_token_aqui" pelo token recebido no login)
+
+### 4.3 Respostas de Erro Comuns
+
+**Token não fornecido (401):**
+```json
+{
+    "error": "Token não fornecido"
+}
+```
+
+**Token inválido (401):**
+```json
+{
+    "error": "Token inválido"
+}
+```
+
+**Token mal formatado (401):**
+```json
+{
+    "error": "Token mal formatado"
+}
+```
+
+**Usuário não encontrado (404):**
+```json
+{
+    "error": "Usuário não encontrado"
+}
+```
+
+**Senha incorreta (401):**
+```json
+{
+    "error": "Senha incorreta"
+}
+```
