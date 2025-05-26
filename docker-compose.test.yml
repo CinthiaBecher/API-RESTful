@@ -1,0 +1,72 @@
+services:
+  postgres_test:
+    image: postgres:latest
+    container_name: api_postgres_test
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: api_db_test
+    ports:
+      - "5433:5432" # Usando porta 5433 para não conflitar com o banco de desenvolvimento
+    networks:
+      - api_test_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migrations_test:
+    image: alpine:latest
+    container_name: api_migrations_test
+    depends_on:
+      postgres_test:
+        condition: service_healthy
+    volumes:
+      - ./src/config/init.sql:/init.sql
+      - ./src/config/run-migrations.sh:/run-migrations.sh
+      - migrations_status:/status
+    command: >
+      sh -c "echo 'Instalando dependências...' &&
+             apk add --no-cache postgresql-client netcat-openbsd &&
+             echo 'Dependências instaladas' &&
+             chmod +x /run-migrations.sh &&
+             echo 'Script com permissão de execução' &&
+             echo 'Conteúdo do init.sql:' &&
+             cat /init.sql &&
+             echo 'Executando migrations...' &&
+             /run-migrations.sh &&
+             echo 'Migrations executadas!' &&
+             touch /status/migrations.done"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: api_db_test
+      POSTGRES_HOST: postgres_test
+      POSTGRES_PORT: 5432
+    networks:
+      - api_test_network
+
+  wait_for_migrations:
+    image: alpine:latest
+    container_name: api_wait_migrations
+    depends_on:
+      migrations_test:
+        condition: service_completed_successfully
+    volumes:
+      - migrations_status:/status
+    command: >
+      sh -c "echo 'Aguardando migrations...' &&
+             while [ ! -f /status/migrations.done ]; do
+               sleep 1
+             done &&
+             echo 'Migrations concluídas!'"
+    networks:
+      - api_test_network
+
+networks:
+  api_test_network:
+    driver: bridge
+
+volumes:
+  migrations_status:

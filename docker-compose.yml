@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   postgres:
@@ -15,7 +15,7 @@ services:
     networks:
       - api_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"] `98
       interval: 5s
       timeout: 5s
       retries: 5
@@ -69,4 +69,4 @@ volumes:
 
 networks:
   api_network:
-    driver: bridge 
+    driver: bridge

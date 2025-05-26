@@ -1,11 +1,11 @@
 #!/bin/sh
 
 echo "Aguardando o banco de dados estar pronto..."
-while ! nc -z postgres 5432; do
+while ! nc -z ${POSTGRES_HOST:-postgres} ${POSTGRES_PORT:-5432}; do
   sleep 1
 done
 
 echo "Executando migrations..."
-PGPASSWORD=postgres psql -h postgres -U postgres -d api_db -f /init.sql
+PGPASSWORD=${POSTGRES_PASSWORD:-postgres} psql -h ${POSTGRES_HOST:-postgres} -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-api_db} -f /init.sql
 
 echo "Migrations executadas com sucesso!" 
