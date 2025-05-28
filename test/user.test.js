@@ -137,4 +137,94 @@ describe("Testes de manipulação de usuários", () => {
       expect(response.body.error).toBe("Usuário não encontrado");
     });
   });
+  describe("PUT /users/:id", () => {
+    test("deve retornar 404 quando nao encontrar o usuario com o ID", async () => {
+      const updateData = {
+        name: "User Test Atualizado",
+        username: "User Test Atualizado",
+        password: "123456",
+      };
+
+      const response = await request(app)
+        .put(`/users/${9999}`)
+        .set("Authorization", `Bearer ${authToken}`)
+        .send(updateData);
+
+      expect(response.status).toBe(404);
+      expect(response.body.error).toBe("Usuário não encontrado");
+    });
+
+    test("deve retornar 400 quando nome tiver menos que 3 caracteres", async () => {
+      const updateData = {
+        name: "oi",
+        username: "User Test Atualizado",
+        password: "123456",
+      };
+
+      const response = await request(app)
+        .put(`/users/${userID}`)
+        .set("Authorization", `Bearer ${authToken}`)
+        .send(updateData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe("Nome deve ter pelo menos 3 caracteres");
+    });
+
+    test("deve retornar 400 quando username tiver menos que 3 caracteres", async () => {
+      const updateData = {
+        name: "User Test Atualizado",
+        username: "oi",
+        password: "123456",
+      };
+
+      const response = await request(app)
+        .put(`/users/${userID}`)
+        .set("Authorization", `Bearer ${authToken}`)
+        .send(updateData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe(
+        "Username deve ter pelo menos 3 caracteres"
+      );
+    });
+
+    test("deve retornar 400 quando password tiver menos que 6 caracteres", async () => {
+      const updateData = {
+        name: "User Test Atualizado",
+        username: "User Test Atualizado",
+        password: "1234",
+      };
+
+      const response = await request(app)
+        .put(`/users/${userID}`)
+        .set("Authorization", `Bearer ${authToken}`)
+        .send(updateData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe(
+        "Senha deve ter pelo menos 6 caracteres"
+      );
+    });
+
+    test("deve retornar 200 quando conseguir atualizar o usuario com sucesso", async () => {
+      const updateData = {
+        name: "User Test Atualizado",
+        username: "User Test Atualizado",
+        password: "12345678",
+      };
+
+      const response = await request(app)
+        .put(`/users/${userID}`)
+        .set("Authorization", `Bearer ${authToken}`)
+        .send(updateData);
+
+      console.log("Resposta1:", response.body);
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({
+        id: userID,
+        name: "User Test Atualizado",
+        username: "User Test Atualizado",
+      });
+    });
+  });
 });
