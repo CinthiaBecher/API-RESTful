@@ -37,7 +37,7 @@ describe("Testes de manipulação de tasks", () => {
           user_id: userID,
         });
       taskID = response.body.id;
-      console.log("Resposta task: ", response.body);
+
       expect(response.status).toBe(201);
       expect(response.body).toEqual({
         id: taskID,
@@ -46,6 +46,80 @@ describe("Testes de manipulação de tasks", () => {
         status: "pendente",
         user_id: userID,
       });
+    });
+    test("deve retornar 201 quando conseguir criar a task com status especifico", async () => {
+      const response = await request(app)
+        .post("/tasks")
+        .set("Authorization", `Bearer ${authToken}`)
+        .send({
+          title: "Task 2",
+          description: "Task 2",
+          user_id: userID,
+          status: "em_andamento",
+        });
+      taskID = response.body.id;
+
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual({
+        id: taskID,
+        title: "Task 2",
+        description: "Task 2",
+        status: "em_andamento",
+        user_id: userID,
+      });
+    });
+    test("deve retornar 422 quando nao inserir titulo", async () => {
+      const response = await request(app)
+        .post("/tasks")
+        .set("Authorization", `Bearer ${authToken}`)
+        .send({
+          description: "Task 1",
+          user_id: userID,
+        });
+
+      expect(response.status).toBe(422);
+      expect(response.body.error).toBe("Título é obrigatório");
+    });
+    test("deve retornar 422 quando nao inserir user ID", async () => {
+      const response = await request(app)
+        .post("/tasks")
+        .set("Authorization", `Bearer ${authToken}`)
+        .send({
+          title: "Task 1",
+          description: "Task 1",
+        });
+
+      expect(response.status).toBe(422);
+      expect(response.body.error).toBe("ID do usuário é obrigatório");
+    });
+    test("deve retornar 404 quando nao encontrar o usuario pela ID", async () => {
+      const response = await request(app)
+        .post("/tasks")
+        .set("Authorization", `Bearer ${authToken}`)
+        .send({
+          title: "Task 1",
+          description: "Task 1",
+          user_id: 9999,
+        });
+
+      expect(response.status).toBe(404);
+      expect(response.body.error).toBe("Usuário não encontrado");
+    });
+    test("deve retornar 400 quando inserir status invalido", async () => {
+      const response = await request(app)
+        .post("/tasks")
+        .set("Authorization", `Bearer ${authToken}`)
+        .send({
+          title: "Task 3",
+          description: "Task 3",
+          user_id: userID,
+          status: "novo",
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe(
+        "Status inválido. Use: pendente, em_andamento ou concluida"
+      );
     });
   });
 });
