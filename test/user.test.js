@@ -218,13 +218,31 @@ describe("Testes de manipulação de usuários", () => {
         .set("Authorization", `Bearer ${authToken}`)
         .send(updateData);
 
-      console.log("Resposta1:", response.body);
       expect(response.status).toBe(200);
       expect(response.body).toEqual({
         id: userID,
         name: "User Test Atualizado",
         username: "User Test Atualizado",
       });
+    });
+  });
+  describe("DELETE /users/:id", () => {
+    test("deve retornar 204 quando conseguir deletar o usuario com sucesso", async () => {
+      const response = await request(app)
+        .delete(`/users/${userID}`)
+        .set("Authorization", `Bearer ${authToken}`);
+
+      console.log("Resposta1:", response.body);
+      expect(response.status).toBe(204);
+    });
+
+    test("deve retornar 404 quando nao encontrar o usuario com o ID", async () => {
+      const response = await request(app)
+        .delete(`/users/${999}`)
+        .set("Authorization", `Bearer ${authToken}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body.error).toBe("Usuário não encontrado");
     });
   });
 });
