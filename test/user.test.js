@@ -24,13 +24,13 @@ describe("Testes de manipulação de usuários", () => {
   });
 
   describe("POST /users", () => {
-    test("deve retornar 200 quando inserir username e senha para criar usuario", async () => {
+    test("deve retornar 201 quando inserir username e senha para criar usuario", async () => {
       const response = await request(app).post("/users").send({
         name: "testuser2",
         username: "testuser2",
         password: "senha12878",
       });
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(201);
       expect(response.body).toEqual({
         id: expect.any(Number),
         name: "testuser2",

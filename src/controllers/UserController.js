@@ -19,11 +19,11 @@ class UserController {
 
   // [POST] /users
   // Cria um novo usuário. Espera receber os dados no corpo da requisição (JSON).
-  // Retorna 200 para sucesso, 422 para erros de validação e 400 para outros erros.
+  // Retorna 201 para sucesso, 422 para erros de validação e 400 para outros erros.
   async create(req, res) {
     try {
       const user = await UserService.create(req.body);
-      return res.status(200).json(user);
+      return res.status(201).json(user);
     } catch (error) {
       if (error.message.includes("obrigatório")) {
         return res.status(422).json({ error: error.message });
