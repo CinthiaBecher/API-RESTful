@@ -2,25 +2,46 @@ const request = require("supertest");
 const app = require("../src/index"); // Importa a aplicação Express
 
 describe("Testes de manipulação de usuários", () => {
+  let authToken;
+  let userID;
+
+  // Criar usuário e obter token antes dos testes
+  beforeAll(async () => {
+    // Primeiro criar o usuário
+    const createResponse = await request(app).post("/users").send({
+      name: "testuser",
+      username: "testuser",
+      password: "123456",
+    });
+    userID = createResponse.body.id;
+
+    // Depois fazer login para obter o token
+    const loginResponse = await request(app).post("/auth/login").send({
+      username: "testuser",
+      password: "123456",
+    });
+    authToken = loginResponse.body.token;
+  });
+
   describe("POST /users", () => {
-    test("deve retornar 201 quando inserir username e senha para criar usuario", async () => {
+    test("deve retornar 200 quando inserir username e senha para criar usuario", async () => {
       const response = await request(app).post("/users").send({
-        name: "gabrielle5",
-        username: "gabrielle5",
-        password: "1234562",
+        name: "testuser2",
+        username: "testuser2",
+        password: "senha12878",
       });
-      expect(response.status).toBe(201);
+      expect(response.status).toBe(200);
       expect(response.body).toEqual({
-        id: expect.any(Number), // O ID pode ser qualquer número
-        name: "gabrielle5",
-        username: "gabrielle5",
+        id: expect.any(Number),
+        name: "testuser2",
+        username: "testuser2",
       });
     });
 
     test("deve retornar 400 quando inserir usuario que ja está em uso", async () => {
       const response = await request(app).post("/users").send({
-        name: "gabrielle5",
-        username: "gabrielle5",
+        name: "testuser",
+        username: "testuser",
         password: "1234562",
       });
       expect(response.status).toBe(400);
@@ -29,7 +50,7 @@ describe("Testes de manipulação de usuários", () => {
 
     test("deve retornar 422 quando nao inserir nome", async () => {
       const response = await request(app).post("/users").send({
-        username: "gabrielle5",
+        username: "testuser",
         password: "1234562",
       });
       expect(response.status).toBe(422);
@@ -40,7 +61,7 @@ describe("Testes de manipulação de usuários", () => {
 
     test("deve retornar 422 quando nao inserir username", async () => {
       const response = await request(app).post("/users").send({
-        name: "gabrielle5",
+        name: "testuser",
         password: "1234562",
       });
       expect(response.status).toBe(422);
@@ -51,8 +72,8 @@ describe("Testes de manipulação de usuários", () => {
 
     test("deve retornar 422 quando nao inserir senha", async () => {
       const response = await request(app).post("/users").send({
-        name: "gabrielle5",
-        username: "gabrielle5",
+        name: "testuser",
+        username: "testuser",
       });
       expect(response.status).toBe(422);
       expect(response.body.error).toBe(
@@ -92,6 +113,28 @@ describe("Testes de manipulação de usuários", () => {
       expect(response.body.error).toBe(
         "Senha deve ter pelo menos 6 caracteres"
       );
+    });
+  });
+  describe("GET /users/:id", () => {
+    test("deve retornar 200 quando encontrar um usuario com o ID", async () => {
+      const response = await request(app)
+        .get(`/users/${userID}`) // Usando o ID real do usuário criado
+        .set("Authorization", `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({
+        id: userID,
+        name: "testuser",
+        username: "testuser",
+      });
+    });
+    test("deve retornar 404 quando nao encontrar o usuario com o ID", async () => {
+      const response = await request(app)
+        .get(`/users/${9999}`)
+        .set("Authorization", `Bearer ${authToken}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body.error).toBe("Usuário não encontrado");
     });
   });
 });

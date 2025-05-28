@@ -2,7 +2,7 @@
 // Recebe as requisições HTTP, chama os serviços (Services) e retorna as respostas apropriadas.
 // Aqui também são definidos os status HTTP e o tratamento de erros.
 
-const UserService = require('../services/UserService');
+const UserService = require("../services/UserService");
 
 class UserController {
   // [GET] /users
@@ -19,13 +19,13 @@ class UserController {
 
   // [POST] /users
   // Cria um novo usuário. Espera receber os dados no corpo da requisição (JSON).
-  // Retorna 201 para sucesso, 422 para erros de validação e 400 para outros erros.
+  // Retorna 200 para sucesso, 422 para erros de validação e 400 para outros erros.
   async create(req, res) {
     try {
       const user = await UserService.create(req.body);
-      return res.status(201).json(user);
+      return res.status(200).json(user);
     } catch (error) {
-      if (error.message.includes('obrigatório')) {
+      if (error.message.includes("obrigatório")) {
         return res.status(422).json({ error: error.message });
       }
       return res.status(400).json({ error: error.message });
@@ -40,7 +40,7 @@ class UserController {
       const user = await UserService.findById(id);
       return res.status(200).json(user);
     } catch (error) {
-      if (error.message === 'Usuário não encontrado') {
+      if (error.message === "Usuário não encontrado") {
         return res.status(404).json({ error: error.message });
       }
       return res.status(400).json({ error: error.message });
@@ -56,10 +56,10 @@ class UserController {
       const user = await UserService.update(id, req.body);
       return res.status(200).json(user);
     } catch (error) {
-      if (error.message === 'Usuário não encontrado') {
+      if (error.message === "Usuário não encontrado") {
         return res.status(404).json({ error: error.message });
       }
-      if (error.message.includes('obrigatório')) {
+      if (error.message.includes("obrigatório")) {
         return res.status(422).json({ error: error.message });
       }
       return res.status(400).json({ error: error.message });
@@ -74,7 +74,7 @@ class UserController {
       await UserService.delete(id);
       return res.status(204).send();
     } catch (error) {
-      if (error.message === 'Usuário não encontrado') {
+      if (error.message === "Usuário não encontrado") {
         return res.status(404).json({ error: error.message });
       }
       return res.status(400).json({ error: error.message });
@@ -83,4 +83,4 @@ class UserController {
 }
 
 // Exporta uma instância do controller para ser usada nas rotas
-module.exports = new UserController(); 
+module.exports = new UserController();
