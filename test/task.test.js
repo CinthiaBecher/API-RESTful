@@ -122,4 +122,5 @@ describe("Testes de manipulação de tasks", () => {
       );
     });
   });
+  describe("GET /tasks/:id", () => {});
 });
