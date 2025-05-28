@@ -57,11 +57,10 @@ describe("Testes de manipulação de tasks", () => {
           user_id: userID,
           status: "em_andamento",
         });
-      taskID = response.body.id;
 
       expect(response.status).toBe(201);
       expect(response.body).toEqual({
-        id: taskID,
+        id: 2,
         title: "Task 2",
         description: "Task 2",
         status: "em_andamento",
@@ -122,5 +121,28 @@ describe("Testes de manipulação de tasks", () => {
       );
     });
   });
-  describe("GET /tasks/:id", () => {});
+  describe("GET /tasks/:id", () => {
+    test("deve retornar 200 quando encontrar a task", async () => {
+      const response = await request(app)
+        .get(`/tasks/${taskID}`) // Usando o ID real do usuário criado
+        .set("Authorization", `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({
+        id: taskID,
+        title: "Task 1",
+        description: "Task 1",
+        status: "pendente",
+        user_id: userID,
+      });
+    });
+    test("deve retornar 404 quando nao encontrar a task", async () => {
+      const response = await request(app)
+        .get(`/tasks/${9999}`) // Usando o ID real do usuário criado
+        .set("Authorization", `Bearer ${authToken}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body.error).toBe("Tarefa não encontrada");
+    });
+  });
 });
