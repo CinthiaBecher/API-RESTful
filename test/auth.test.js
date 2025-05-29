@@ -16,9 +16,8 @@ describe("Testes de Autenticação", () => {
   describe("POST /auth/login", () => {
     test("deve retornar erro 422 quando não inserir username e senha", async () => {
       const response = await request(app).post("/auth/login").send({});
-      console.log("Resposta1:", response.body); // Log para debug
+
       expect(response.status).toBe(422);
-      expect(response.body).toHaveProperty("error");
       expect(response.body.error).toBe("Username e senha são obrigatórios");
     });
 
@@ -28,9 +27,7 @@ describe("Testes de Autenticação", () => {
         password: "senha12345",
       });
 
-      console.log("Resposta2:", response.body); // Log para debug
       expect(response.status).toBe(404);
-      expect(response.body).toHaveProperty("error");
       expect(response.body.error).toBe("Usuário não encontrado");
     });
 
@@ -40,9 +37,7 @@ describe("Testes de Autenticação", () => {
         password: "senha_errada",
       });
 
-      console.log("Resposta3:", response.body); // Log para debug
       expect(response.status).toBe(401);
-      expect(response.body).toHaveProperty("error");
       expect(response.body.error).toBe("Senha incorreta");
     });
 
@@ -51,7 +46,7 @@ describe("Testes de Autenticação", () => {
         username: "testlogin",
         password: "senha12345",
       });
-      console.log("Resposta4:", response.body); // Log para debug
+
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty("token");
       expect(typeof response.body.token).toBe("string");

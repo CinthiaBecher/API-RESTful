@@ -47,6 +47,28 @@ describe("Testes de manipulação de tasks", () => {
         user_id: userID,
       });
     });
+    test("deve retornar 401 quando nao inserir token", async () => {
+      const response = await request(app).post("/tasks").send({
+        title: "Task 10",
+        description: "Task 10",
+        user_id: userID,
+      });
+      expect(response.status).toBe(401);
+      expect(response.body.error).toBe("Token não fornecido");
+    });
+    test("deve retornar 401 quando o token inserido for invalido", async () => {
+      const response = await request(app)
+        .post("/tasks")
+        .set("Authorization", `Bearer ${"tokenErrado"}`)
+        .send({
+          title: "Task 10",
+          description: "Task 10",
+          user_id: userID,
+        });
+      expect(response.status).toBe(401);
+      expect(response.body.error).toBe("Token inválido");
+    });
+
     test("deve retornar 201 quando conseguir criar a task com status especifico", async () => {
       const response = await request(app)
         .post("/tasks")
