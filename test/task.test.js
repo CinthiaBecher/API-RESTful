@@ -145,4 +145,64 @@ describe("Testes de manipulação de tasks", () => {
       expect(response.body.error).toBe("Tarefa não encontrada");
     });
   });
+  describe("PUT /tasks/:id", () => {
+    test("deve retornar 200 quando conseguir atualizar a task com sucesso", async () => {
+      const response = await request(app)
+        .put(`/tasks/${taskID}`) // Usando o ID real do usuário criado
+        .set("Authorization", `Bearer ${authToken}`)
+        .send({
+          title: "Task 1 Atualizada",
+          description: "Task 1 Atualizada",
+          status: "concluida",
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({
+        id: taskID,
+        title: "Task 1 Atualizada",
+        description: "Task 1 Atualizada",
+        status: "concluida",
+        user_id: userID,
+      });
+    });
+
+    test("deve retornar 404 quando nao encontrar a task", async () => {
+      const response = await request(app)
+        .put(`/tasks/${999}`) // Usando o ID real do usuário criado
+        .set("Authorization", `Bearer ${authToken}`)
+        .send({
+          title: "Task 1 Atualizada",
+          description: "Task 1 Atualizada",
+          status: "concluida",
+        });
+      expect(response.status).toBe(404);
+      expect(response.body.error).toBe("Tarefa não encontrada");
+    });
+
+    test("deve retornar 422 quando nao inserir titulo", async () => {
+      const response = await request(app)
+        .put(`/tasks/${taskID}`) // Usando o ID real do usuário criado
+        .set("Authorization", `Bearer ${authToken}`)
+        .send({
+          description: "Task 1 Atualizada",
+          status: "concluida",
+        });
+      expect(response.status).toBe(422);
+      expect(response.body.error).toBe("Título é obrigatório");
+    });
+
+    test("deve retornar 400 quando o status inserido for invalido", async () => {
+      const response = await request(app)
+        .put(`/tasks/${taskID}`) // Usando o ID real do usuário criado
+        .set("Authorization", `Bearer ${authToken}`)
+        .send({
+          title: "Task 1 Atualizada",
+          status: "errado",
+        });
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe(
+        "Status inválido. Use: pendente, em_andamento ou concluida"
+      );
+    });
+  });
 });
