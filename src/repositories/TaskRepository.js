@@ -1,31 +1,17 @@
-const db = require('../config/database');
-const Task = require('../models/Task');
+const db = require("../config/database");
+const Task = require("../models/Task");
 
 class TaskRepository {
-  async findAll() {
-    const query = `
-      SELECT id, title, description, status, user_id
-      FROM tasks
-    `;
-    
-    try {
-      const result = await db.query(query);
-      return result.rows.map(row => Task.fromDatabase(row));
-    } catch (error) {
-      throw error;
-    }
-  }
-
   async findByUserId(userId) {
     const query = `
       SELECT id, title, description, status, user_id
       FROM tasks
       WHERE user_id = $1
     `;
-    
+
     try {
       const result = await db.query(query, [userId]);
-      return result.rows.map(row => Task.fromDatabase(row));
+      return result.rows.map((row) => Task.fromDatabase(row));
     } catch (error) {
       throw error;
     }
@@ -37,9 +23,14 @@ class TaskRepository {
       VALUES ($1, $2, $3, $4)
       RETURNING *
     `;
-    
+
     try {
-      const result = await db.query(query, [title, description, status, user_id]);
+      const result = await db.query(query, [
+        title,
+        description,
+        status,
+        user_id,
+      ]);
       return Task.fromDatabase(result.rows[0]);
     } catch (error) {
       throw error;
@@ -52,7 +43,7 @@ class TaskRepository {
       FROM tasks
       WHERE id = $1
     `;
-    
+
     try {
       const result = await db.query(query, [id]);
       return result.rows[0] ? Task.fromDatabase(result.rows[0]) : null;
@@ -68,9 +59,15 @@ class TaskRepository {
       WHERE id = $5
       RETURNING *
     `;
-    
+
     try {
-      const result = await db.query(query, [title, description, status, user_id, id]);
+      const result = await db.query(query, [
+        title,
+        description,
+        status,
+        user_id,
+        id,
+      ]);
       return result.rows[0] ? Task.fromDatabase(result.rows[0]) : null;
     } catch (error) {
       throw error;
@@ -83,7 +80,7 @@ class TaskRepository {
       WHERE id = $1
       RETURNING *
     `;
-    
+
     try {
       const result = await db.query(query, [id]);
       return result.rows[0] ? Task.fromDatabase(result.rows[0]) : null;
@@ -93,4 +90,4 @@ class TaskRepository {
   }
 }
 
-module.exports = TaskRepository; 
+module.exports = TaskRepository;

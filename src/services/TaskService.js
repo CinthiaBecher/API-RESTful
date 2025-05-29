@@ -7,10 +7,6 @@ class TaskService {
     this.userRepository = new UserRepository();
   }
 
-  async findAll() {
-    return await this.taskRepository.findAll();
-  }
-
   async findByUserId(userId) {
     if (!userId) {
       throw new Error("ID do usuário é obrigatório");

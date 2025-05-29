@@ -1,50 +1,50 @@
-const UserRepository = require('../repositories/UserRepository');
-const bcrypt = require('bcrypt');
+const UserRepository = require("../repositories/UserRepository");
+const bcrypt = require("bcrypt");
 
 class UserService {
   constructor() {
     this.userRepository = new UserRepository();
   }
 
-  async findAll() {
-    return await this.userRepository.findAll();
-  }
-
   async create({ name, username, password }) {
     if (!name || !username || !password) {
-      throw new Error('Nome, username e password são obrigatórios');
+      throw new Error("Nome, username e password são obrigatórios");
     }
 
     if (name.length < 3) {
-      throw new Error('Nome deve ter pelo menos 3 caracteres');
+      throw new Error("Nome deve ter pelo menos 3 caracteres");
     }
 
     if (username.length < 3) {
-      throw new Error('Username deve ter pelo menos 3 caracteres');
+      throw new Error("Username deve ter pelo menos 3 caracteres");
     }
 
     if (password.length < 6) {
-      throw new Error('Senha deve ter pelo menos 6 caracteres');
+      throw new Error("Senha deve ter pelo menos 6 caracteres");
     }
 
     // Verificar se já existe um usuário com este username
     const existingUser = await this.userRepository.findByUsername(username);
     if (existingUser) {
-      throw new Error('Username já está em uso');
+      throw new Error("Username já está em uso");
     }
 
     // Criptografar a senha
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    return await this.userRepository.create({ name, username, password: hashedPassword });
+    return await this.userRepository.create({
+      name,
+      username,
+      password: hashedPassword,
+    });
   }
 
   async findById(id) {
     const user = await this.userRepository.findById(id);
-    
+
     if (!user) {
-      throw new Error('Usuário não encontrado');
+      throw new Error("Usuário não encontrado");
     }
 
     return user;
@@ -52,9 +52,9 @@ class UserService {
 
   async findByUsername(username) {
     const user = await this.userRepository.findByUsername(username);
-    
+
     if (!user) {
-      throw new Error('Usuário não encontrado');
+      throw new Error("Usuário não encontrado");
     }
 
     return user;
@@ -62,29 +62,31 @@ class UserService {
 
   async update(id, { name, username, password }) {
     if (!name || !username || !password) {
-      throw new Error('Nome, username e senha são obrigatórios');
+      throw new Error("Nome, username e senha são obrigatórios");
     }
 
     if (name.length < 3) {
-      throw new Error('Nome deve ter pelo menos 3 caracteres');
+      throw new Error("Nome deve ter pelo menos 3 caracteres");
     }
 
     if (username.length < 3) {
-      throw new Error('Username deve ter pelo menos 3 caracteres');
+      throw new Error("Username deve ter pelo menos 3 caracteres");
     }
 
     if (password.length < 6) {
-      throw new Error('Senha deve ter pelo menos 6 caracteres');
+      throw new Error("Senha deve ter pelo menos 6 caracteres");
     }
 
     // Verificar se o usuário existe
     const existingUser = await this.findById(id);
-    
+
     // Se o username está sendo alterado, verificar se já existe outro usuário com este username
     if (existingUser.username !== username) {
-      const userWithUsername = await this.userRepository.findByUsername(username);
+      const userWithUsername = await this.userRepository.findByUsername(
+        username
+      );
       if (userWithUsername) {
-        throw new Error('Username já está em uso');
+        throw new Error("Username já está em uso");
       }
     }
 
@@ -92,7 +94,11 @@ class UserService {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    return await this.userRepository.update(id, { name, username, password: hashedPassword });
+    return await this.userRepository.update(id, {
+      name,
+      username,
+      password: hashedPassword,
+    });
   }
 
   async delete(id) {
@@ -101,4 +107,4 @@ class UserService {
   }
 }
 
-module.exports = new UserService(); 
+module.exports = new UserService();

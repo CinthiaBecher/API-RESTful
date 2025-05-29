@@ -1,28 +1,14 @@
-const db = require('../config/database');
-const User = require('../models/User');
+const db = require("../config/database");
+const User = require("../models/User");
 
 class UserRepository {
-  async findAll() {
-    const query = `
-      SELECT id, name, username
-      FROM users
-    `;
-    
-    try {
-      const result = await db.query(query);
-      return result.rows.map(row => User.fromDatabase(row));
-    } catch (error) {
-      throw error;
-    }
-  }
-
   async create({ name, username, password }) {
     const query = `
       INSERT INTO users (name, username, password)
       VALUES ($1, $2, $3)
       RETURNING id, name, username
     `;
-    
+
     try {
       const result = await db.query(query, [name, username, password]);
       return User.fromDatabase(result.rows[0]);
@@ -37,7 +23,7 @@ class UserRepository {
       FROM users
       WHERE id = $1
     `;
-    
+
     try {
       const result = await db.query(query, [id]);
       return result.rows[0] ? User.fromDatabase(result.rows[0]) : null;
@@ -52,7 +38,7 @@ class UserRepository {
       FROM users
       WHERE username = $1
     `;
-    
+
     try {
       const result = await db.query(query, [username]);
       return result.rows[0] ? User.fromDatabase(result.rows[0]) : null;
@@ -68,7 +54,7 @@ class UserRepository {
       WHERE id = $4
       RETURNING id, name, username
     `;
-    
+
     try {
       const result = await db.query(query, [name, username, password, id]);
       return result.rows[0] ? User.fromDatabase(result.rows[0]) : null;
@@ -83,7 +69,7 @@ class UserRepository {
       WHERE id = $1
       RETURNING id, name, username
     `;
-    
+
     try {
       const result = await db.query(query, [id]);
       return result.rows[0] ? User.fromDatabase(result.rows[0]) : null;
@@ -93,4 +79,4 @@ class UserRepository {
   }
 }
 
-module.exports = UserRepository; 
+module.exports = UserRepository;

@@ -5,18 +5,6 @@
 const UserService = require("../services/UserService");
 
 class UserController {
-  // [GET] /users
-  // Lista todos os usuários cadastrados.
-  // Utiliza status 200 para sucesso e 400 para outros erros.
-  async index(req, res) {
-    try {
-      const users = await UserService.findAll();
-      return res.status(200).json(users);
-    } catch (error) {
-      return res.status(400).json({ error: error.message });
-    }
-  }
-
   // [POST] /users
   // Cria um novo usuário. Espera receber os dados no corpo da requisição (JSON).
   // Retorna 201 para sucesso, 422 para erros de validação e 400 para outros erros.

@@ -121,7 +121,7 @@ describe("Testes de manipulação de tasks", () => {
       );
     });
   });
-  describe("GET /tasks/:id", () => {
+  describe("GET /tasks/:taskId", () => {
     test("deve retornar 200 quando encontrar a task", async () => {
       const response = await request(app)
         .get(`/tasks/${taskID}`) // Usando o ID real do usuário criado
@@ -138,17 +138,35 @@ describe("Testes de manipulação de tasks", () => {
     });
     test("deve retornar 404 quando nao encontrar a task", async () => {
       const response = await request(app)
-        .get(`/tasks/${9999}`) // Usando o ID real do usuário criado
+        .get(`/tasks/${9999}`)
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(404);
       expect(response.body.error).toBe("Tarefa não encontrada");
     });
   });
+  describe("GET /tasks?assignedTo=userID", () => {
+    test("deve retornar 200 quando encontrar a task", async () => {
+      const response = await request(app)
+        .get(`/tasks?assignedTo=${userID}`)
+        .set("Authorization", `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+    });
+    test("deve retornar 404 quando nao encontrar usuario", async () => {
+      const response = await request(app)
+        .get(`/tasks?assignedTo=${9999}`)
+        .set("Authorization", `Bearer ${authToken}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body.error).toBe("Usuário não encontrado");
+    });
+  });
+
   describe("PUT /tasks/:id", () => {
     test("deve retornar 200 quando conseguir atualizar a task com sucesso", async () => {
       const response = await request(app)
-        .put(`/tasks/${taskID}`) // Usando o ID real do usuário criado
+        .put(`/tasks/${taskID}`)
         .set("Authorization", `Bearer ${authToken}`)
         .send({
           title: "Task 1 Atualizada",
@@ -168,7 +186,7 @@ describe("Testes de manipulação de tasks", () => {
 
     test("deve retornar 404 quando nao encontrar a task", async () => {
       const response = await request(app)
-        .put(`/tasks/${999}`) // Usando o ID real do usuário criado
+        .put(`/tasks/${999}`)
         .set("Authorization", `Bearer ${authToken}`)
         .send({
           title: "Task 1 Atualizada",
@@ -181,7 +199,7 @@ describe("Testes de manipulação de tasks", () => {
 
     test("deve retornar 422 quando nao inserir titulo", async () => {
       const response = await request(app)
-        .put(`/tasks/${taskID}`) // Usando o ID real do usuário criado
+        .put(`/tasks/${taskID}`)
         .set("Authorization", `Bearer ${authToken}`)
         .send({
           description: "Task 1 Atualizada",
@@ -193,7 +211,7 @@ describe("Testes de manipulação de tasks", () => {
 
     test("deve retornar 400 quando o status inserido for invalido", async () => {
       const response = await request(app)
-        .put(`/tasks/${taskID}`) // Usando o ID real do usuário criado
+        .put(`/tasks/${taskID}`)
         .set("Authorization", `Bearer ${authToken}`)
         .send({
           title: "Task 1 Atualizada",
@@ -203,6 +221,24 @@ describe("Testes de manipulação de tasks", () => {
       expect(response.body.error).toBe(
         "Status inválido. Use: pendente, em_andamento ou concluida"
       );
+    });
+  });
+  describe("DELETE /tasks/:id", () => {
+    test("deve retornar 204 quando deletar task com sucesso", async () => {
+      const response = await request(app)
+        .delete(`/tasks/${taskID}`)
+        .set("Authorization", `Bearer ${authToken}`);
+
+      expect(response.status).toBe(204);
+    });
+
+    test("deve retornar 404 quando nao encontrar a tarefa para deletar", async () => {
+      const response = await request(app)
+        .delete(`/tasks/${999}`)
+        .set("Authorization", `Bearer ${authToken}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body.error).toBe("Tarefa não encontrada");
     });
   });
 });
