@@ -2,10 +2,97 @@
 
 Este projeto é uma API RESTful desenvolvida para a disciplina de Engenharia de Software, implementando um sistema de gestão de tarefas colaborativas. O principal objectivo desse sistema é possibilitar a criação de usuários, que poderão criar e editar tarefas, mudando seu status e conteúdo.
 
+## Tecnologias Utilizadas
+
+- Node.js
+- Express
+- Jest
+- PostgreSQL
+- Docker
+- Make
+
 ## Decisões Arquiteturiais
 
 A arquitetura em camadas foi escolhida para o desenvolvimento deste trabalho, principalmente pela facilidade do seu entendimento e pela sua similaridade com o MVC, padrão que o grupo possuía mais familiaridade. Além disso, é uma arquitetura que entrega uma boa organização e modularização do código, e facilita também a implementação de testes.
 
+As seguintes camadas foram criadas:
+
+1) Camada Routes: recebe a requisição HTTP. Nessa camada, os endpoints da API são definidos e as URLs são mapeadas para os controllers apropriados. Exemplo de código no arquivo ```routes/taskRoutes.js```:
+   ```javascript
+   router.post('/tasks', TaskController.create);
+   ```
+
+2) Camada Controllers: recebe os dados da requisição e chama os serviços apropriados. Exemplo de código no arquivo ```controllers/TaskController.js```:
+
+   ```javascript
+   const task = await TaskService.create(req.body);
+   ```
+
+3) Camada Services: faz a validação das regras de negócio e chama o respectivo repositório. Exemplo de código do arquivo ```services/TaskService.js```:
+   ```javascript
+   // Validação de negócio
+     if (!title) {
+       throw new Error('Título é obrigatório');
+     }
+   
+     const validStatuses = ['pendente', 'em_andamento', 'concluida'];
+     if (!validStatuses.includes(status)) {
+       throw new Error('Status inválido');
+     }
+   
+     // Chama o repository para criar a tarefa
+     return await this.taskRepository.create({ 
+       title, 
+       description, 
+       status 
+     });
+   ```
+
+4) Camada Repositories: executa a operação no banco de dados e converte o resultado para um objeto da camada Model. Exemplo de código do arquivo ```repositories/TaskRepository.js```:
+
+   ```javascript
+   async create({ title, description, status }) {
+     const query = `
+       INSERT INTO tasks (title, description, status)
+       VALUES ($1, $2, $3)
+       RETURNING *
+     `;
+     
+     try {
+       // 5. Executa a operação no banco de dados
+       const result = await db.query(query, [title, description, status]);
+       // 5.1. Converte o resultado para um objeto Task
+       return Task.fromDatabase(result.rows[0]);
+     } catch (error) {
+       throw error;
+     }
+   }
+   ```
+5) Camada de Models: possui o modelo de negócios. Exemplo de código do arquivo ```models/User.js```:
+
+   ```javascript
+   class User {
+     constructor({ id, name, username, password }) {
+       this.id = id;
+       this.name = name;
+       this.username = username;
+       this.password = password;
+     }
+   
+     isValid() {
+       return this.name && this.username && this.password;
+     }
+   
+     static fromDatabase(row) {
+       return new User({
+         id: row.id,
+         name: row.name,
+         username: row.username,
+         password: row.password,
+       });
+     }
+   }
+   ```
 Além disso, foi utilizado containers Dockers na arquitetura, para que seja mais fácil para o usuário executar a API desenvolvida, sem que ele precise instalar as diversas dependências. Três containers são criados inicialmente: um para o banco de dados, outro para a aplicação e um terceiro para a inicialização do banco e configurações iniciais. Esse terceiro é finalizado logo depois da sua criação e execução, então a arquitetura final fica de fato com dois containers em execução.
 
 Considerando os containers e a arquitetura em camadas, a arquitetura final ficou da seguinte forma:
@@ -83,15 +170,6 @@ Dez endpoints são entregues pela API, includindo:
    ```
 
 Esses e todos os outros endpoints entregues estão documentados utilizando o Swagger. Para entender mais sobre cada um, pode-se acessar essa documentação através da URL http://localhost:3000/api-docs/, que funcionará assim que a API for inicializada.
-
-## Tecnologias Utilizadas
-
-- Node.js
-- Express
-- Jest
-- PostgreSQL
-- Docker
-- Make
 
 ## Pré-requisitos
 
