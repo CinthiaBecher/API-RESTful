@@ -204,12 +204,18 @@ Além disso, para facilitar os testes da API, a biblioteca supertest foi utiliza
   
 ### Executando os testes
 
-Para executar os testes, basta rodar o seguinte comando no terminal:
+Como os testes são executados localmente, tendo apenas o banco de dados nos containers, é preciso primeiro baixar as dependências através do seguinte comando:
+
+```bash
+npm install
+```
+
+Em seguida, pode-se executar os testes:
 
 ```bash
 npm test
 ```
-Para executar os testes e mostrar a cobertura dos mesmos, o seguinte comando pode ser utilizado:
+Para mostrar a cobertura dos testes ao executá-los, o seguinte comando pode ser utilizado:
 
 ```bash
 npm test -- --coverage
