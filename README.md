@@ -95,6 +95,20 @@ As seguintes camadas foram criadas:
    ```
 Além disso, foi utilizado containers Dockers na arquitetura, para que seja mais fácil para o usuário executar a API desenvolvida, sem que ele precise instalar as diversas dependências. Três containers são criados inicialmente: um para o banco de dados, outro para a aplicação e um terceiro para a inicialização do banco e configurações iniciais. Esse terceiro é finalizado logo depois da sua criação e execução, então a arquitetura final fica de fato com dois containers em execução.
 
+1. **PostgreSQL** (`postgres`):
+   - Banco de dados principal
+   - Porta: 5432
+   - Credenciais padrão: postgres/postgres
+
+2. **Migrations** (`migrations`):
+   - Executa as migrations do banco de dados
+   - Roda apenas uma vez durante a inicialização
+
+3. **API** (`service`):
+   - Servidor Node.js
+   - Porta: 3000
+   - Hot-reload ativado para desenvolvimento
+
 Considerando os containers e a arquitetura em camadas, a arquitetura final ficou da seguinte forma:
 
 <div align="center">
@@ -231,26 +245,6 @@ docker-compose down
 # Ver logs
 docker-compose logs -f
 ```
-
-
-
-## Serviços
-
-O projeto utiliza três serviços Docker:
-
-1. **PostgreSQL** (`postgres`):
-   - Banco de dados principal
-   - Porta: 5432
-   - Credenciais padrão: postgres/postgres
-
-2. **Migrations** (`migrations`):
-   - Executa as migrations do banco de dados
-   - Roda apenas uma vez durante a inicialização
-
-3. **API** (`api`):
-   - Servidor Node.js
-   - Porta: 3000
-   - Hot-reload ativado para desenvolvimento
 
 
 
