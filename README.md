@@ -112,7 +112,7 @@ Além disso, foi utilizado containers Dockers na arquitetura, para que seja mais
 Considerando os containers e a arquitetura em camadas, a arquitetura final ficou da seguinte forma:
 
 <div align="center">
-   <img src="https://github.com/CinthiaBecher/API-RESTful/blob/main/Arquitetura_em_camadas.png" alt="Arquitetura em camadas da API" width="300px" height="400px">
+   <img src="https://github.com/CinthiaBecher/API-RESTful/blob/main/Arquitetura_em_camadas.png" alt="Arquitetura em camadas da API" width="400px" height="500px">
 </div>
 
 ## Modelagem de Dados
@@ -185,13 +185,15 @@ Dez endpoints são entregues pela API, includindo:
 
 Esses e todos os outros endpoints entregues estão documentados utilizando o Swagger. Para entender mais sobre cada um, pode-se acessar essa documentação através da URL http://localhost:3000/api-docs/, que funcionará assim que a API for inicializada.
 
-## Pré-requisitos
+## Configuração e Deploy 
+
+### Pré-requisitos
 
 Antes de começar, você precisa ter instalado:
 - Docker
 - Make (já vem instalado no Mac, no Windows pode ser instalado via Chocolatey)
 
-### Instalação do Make no Windows
+#### Instalação do Make no Windows
 1. Instale o Chocolatey (gerenciador de pacotes para Windows):
    ```powershell
    Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
@@ -201,7 +203,7 @@ Antes de começar, você precisa ter instalado:
    choco install make
    ```
 
-## Configuração do Ambiente
+### Configuração do Ambiente
 
 1. Clone o repositório:
 ```bash
@@ -211,9 +213,9 @@ cd API-RESTful
 
 2. Certifique-se que o Docker Desktop está rodando
 
-## Executando o Projeto
+### Executando o Projeto
 
-### Usando Make (Recomendado)
+#### Usando Make (Recomendado)
 
 O projeto inclui um Makefile com vários comandos úteis. Para ver todos os comandos disponíveis:
 ```bash
@@ -231,7 +233,7 @@ Outros comandos úteis:
 - `make db-reset` - Reseta o banco de dados (remove volume e executa migrations)
 - `make clean` - Remove containers, imagens e volumes não utilizados
 
-### Usando Docker Compose diretamente
+#### Usando Docker Compose diretamente
 
 Se preferir não usar o Make, você pode usar os comandos do Docker Compose diretamente:
 
@@ -246,7 +248,27 @@ docker-compose down
 docker-compose logs -f
 ```
 
+## Testes automatizados
 
+O framework Jest foi utilizado para a implementação dos testes unitários. Para deixar o ambiente de testes isolado, foi criado um novo arquivo Docker para a criação de três containers dedicados aos testes. Assim, haverá um banco de dados único para os testes e eles executaram de forma isolada da aplicação principal.
+
+Os seguintes containers são criados ao executar os testes:
+
+1) postgres_test (```api_postgres_test```):
+   - Primeiro container a ser iniciado
+   - É o banco de dados PostgreSQL usado exclusivamente para testes
+   - Porta: 5433 (mapeada para 5432 internamente, para não conflitar com o banco de desenvolvimento)
+   - Credenciais padrão: postgres/postgres
+2) migrations_test (```api_migrations_test```):
+   - Cria as tabelas no banco de dados de teste
+   - Só inicia depois que o postgres_test estiver saudável (healthcheck ok)
+   - Instala as dependências necessárias (postgresql-client)
+   - Executa o script de migrations (run-migrations.sh)
+3) wait_for_migrations (```api_wait_migrations```):
+   - É um container de controle que aguarda a conclusão das migrations, para garantir que os testes s'po comecem deppis que o banco de dados estiver completamente configurado.
+   - Só inicia depois que o migrations_test terminar com sucesso
+   - Fica em loop verificando se o arquivo migrations.done existe
+   - Quando encontra o arquivo, significa que as migrations foram concluídas
 
 ## Autores
 
