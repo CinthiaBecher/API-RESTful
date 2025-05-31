@@ -14,8 +14,3 @@ CREATE TABLE IF NOT EXISTS tasks (
     status VARCHAR(20) NOT NULL DEFAULT 'pendente'::VARCHAR(20), -- Status da tarefa (obrigatório)
     user_id INTEGER REFERENCES users(id) -- ID do usuário responsável pela tarefa
 );
-
--- Para verificar se a tabela foi criada corretamente, você pode usar:
--- \dt (lista todas as tabelas)
--- \d users (mostra a estrutura da tabela users)
--- \d tasks (mostra a estrutura da tabela tasks) 
