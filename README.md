@@ -10,7 +10,24 @@ Além disso, foi utilizado containers Dockers na arquitetura, para que seja mais
 
 Considerando os containers e a arquitetura em camadas, a arquitetura final ficou da seguinte forma:
 
+<img src="https://github.com/CinthiaBecher/API-RESTful/blob/main/Arquitetura_em_camadas.png" alt="Arquitetura em camadas da API" width="300px" height="400px">
 
+## Modelagem de Dados
+
+Haverá duas tabelas no banco de dados: uma de usuário e outra de tarefas.
+- Tabela User (usuário): essa tabela armazenará os dados do usuário, incluindo ID (chave primária), nome, username e senha.
+- Tabela Task (tarefa): essa tabela guarda as tarefas criadas e seus dados, incluindo ID (chave primária), título, descrição, status e user_ID (chave secundária que guarda o usuário atribuído à tarefa).
+
+O diagrama entidade-relacional pode ser representado da seguinte maneira:
+
+<img src="https://github.com/CinthiaBecher/API-RESTful/blob/main/Diagrama%20ER.png" alt="Arquitetura em camadas da API" width="150px" height="400px">
+
+## Fluxo de Requisições
+
+Os seguintes endpoints são entregues na API:
+
+### Usuários
+- POST /users = cria um novo usuário
 
 ## Tecnologias Utilizadas
 
