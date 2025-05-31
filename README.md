@@ -17,82 +17,12 @@ A arquitetura em camadas foi escolhida para o desenvolvimento deste trabalho, pr
 
 As seguintes camadas foram criadas:
 
-1) Camada Routes: recebe a requisição HTTP. Nessa camada, os endpoints da API são definidos e as URLs são mapeadas para os controllers apropriados. Exemplo de código no arquivo ```routes/taskRoutes.js```:
-   ```javascript
-   router.post('/tasks', TaskController.create);
-   ```
+1) Camada Routes: recebe a requisição HTTP. Nessa camada, os endpoints da API são definidos e as URLs são mapeadas para os controllers apropriados.
+2) Camada Controllers: recebe os dados da requisição e chama os serviços apropriados.
+3) Camada Services: faz a validação das regras de negócio e chama o respectivo repositório.
+4) Camada Repositories: executa a operação no banco de dados e converte o resultado para um objeto da camada Model. 
+5) Camada de Models: possui o modelo de negócios. 
 
-2) Camada Controllers: recebe os dados da requisição e chama os serviços apropriados. Exemplo de código no arquivo ```controllers/TaskController.js```:
-
-   ```javascript
-   const task = await TaskService.create(req.body);
-   ```
-
-3) Camada Services: faz a validação das regras de negócio e chama o respectivo repositório. Exemplo de código do arquivo ```services/TaskService.js```:
-   ```javascript
-   // Validação de negócio
-     if (!title) {
-       throw new Error('Título é obrigatório');
-     }
-   
-     const validStatuses = ['pendente', 'em_andamento', 'concluida'];
-     if (!validStatuses.includes(status)) {
-       throw new Error('Status inválido');
-     }
-   
-     // Chama o repository para criar a tarefa
-     return await this.taskRepository.create({ 
-       title, 
-       description, 
-       status 
-     });
-   ```
-
-4) Camada Repositories: executa a operação no banco de dados e converte o resultado para um objeto da camada Model. Exemplo de código do arquivo ```repositories/TaskRepository.js```:
-
-   ```javascript
-   async create({ title, description, status }) {
-     const query = `
-       INSERT INTO tasks (title, description, status)
-       VALUES ($1, $2, $3)
-       RETURNING *
-     `;
-     
-     try {
-       // 5. Executa a operação no banco de dados
-       const result = await db.query(query, [title, description, status]);
-       // 5.1. Converte o resultado para um objeto Task
-       return Task.fromDatabase(result.rows[0]);
-     } catch (error) {
-       throw error;
-     }
-   }
-   ```
-5) Camada de Models: possui o modelo de negócios. Exemplo de código do arquivo ```models/User.js```:
-
-   ```javascript
-   class User {
-     constructor({ id, name, username, password }) {
-       this.id = id;
-       this.name = name;
-       this.username = username;
-       this.password = password;
-     }
-   
-     isValid() {
-       return this.name && this.username && this.password;
-     }
-   
-     static fromDatabase(row) {
-       return new User({
-         id: row.id,
-         name: row.name,
-         username: row.username,
-         password: row.password,
-       });
-     }
-   }
-   ```
 Além disso, foi utilizado containers Dockers na arquitetura, para que seja mais fácil para o usuário executar a API desenvolvida, sem que ele precise instalar as diversas dependências. Três containers são criados inicialmente: um para o banco de dados, outro para a aplicação e um terceiro para a inicialização do banco e configurações iniciais. Esse terceiro é finalizado logo depois da sua criação e execução, então a arquitetura final fica de fato com dois containers em execução.
 
 1. **PostgreSQL** (`postgres`):
@@ -124,7 +54,7 @@ Haverá duas tabelas no banco de dados: uma de usuário e outra de tarefas.
 O diagrama entidade-relacional pode ser representado da seguinte maneira:
 
 <div align="center">
-   <img src="https://github.com/CinthiaBecher/API-RESTful/blob/main/Diagrama%20ER.png" alt="Arquitetura em camadas da API" width="150px" height="400px">
+   <img src="https://github.com/CinthiaBecher/API-RESTful/blob/main/Diagrama%20ER.png" alt="Diagrama entidade-relacionamento" width="150px" height="400px">
 </div>
 
 ## Fluxo de Requisições
@@ -291,9 +221,11 @@ Os testes se encontram dentro da pasta test, e foram separados conforme os arqui
 
 O foco principal foi testar os endpoints da API. Assim, foi testado todos os casos de sucesso dos endpoints, bem como também alguns ou todos os seus respectivos erros, seja por falta de informação ou informações incorretas inseridas pelo usuário.
 
-No final, a cobertura do código ficou da seguinte forma:
+No final, a cobertura do código ficou acima dos 60% requisitados, como pode-se ver na figura abaixo:
 
-
+<div align="center">
+   <img src="https://github.com/CinthiaBecher/API-RESTful/blob/main/Cobertura_testes.png" alt="cobertura dos testes" width="370px" height="400px">
+</div>
 
 ## Autores
 
