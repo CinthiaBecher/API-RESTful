@@ -1,11 +1,22 @@
 # API RESTful - Sistema de Gestão de Tarefas Colaborativas
 
-Este projeto é uma API RESTful desenvolvida para a disciplina de Engenharia de Software, implementando um sistema de gestão de tarefas colaborativas.
+Este projeto é uma API RESTful desenvolvida para a disciplina de Engenharia de Software, implementando um sistema de gestão de tarefas colaborativas. O principal objectivo desse sistema é possibilitar a criação de usuários, que poderão criar e editar tarefas, mudando seu status e conteúdo.
+
+## Decisões Arquiteturiais
+
+A arquitetura em camadas foi escolhida para o desenvolvimento deste trabalho, principalmente pela facilidade do seu entendimento e pela sua similaridade com o MVC, padrão que o grupo possuía mais familiaridade. Além disso, é uma arquitetura que entrega uma boa organização e modularização do código, e facilita também a implementação de testes.
+
+Além disso, foi utilizado containers Dockers na arquitetura, para que seja mais fácil para o usuário executar a API desenvolvida, sem que ele precise instalar as diversas dependências. Três containers são criados inicialmente: um para o banco de dados, outro para a aplicação e um terceiro para a inicialização do banco e configurações iniciais. Esse terceiro é finalizado logo depois da sua criação e execução, então a arquitetura final fica de fato com dois containers em execução.
+
+Considerando os containers e a arquitetura em camadas, a arquitetura final ficou da seguinte forma:
+
+
 
 ## Tecnologias Utilizadas
 
 - Node.js
 - Express
+- Jest
 - PostgreSQL
 - Docker
 - Make
