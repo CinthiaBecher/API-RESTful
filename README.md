@@ -250,7 +250,7 @@ docker-compose logs -f
 
 ## Testes automatizados
 
-O framework Jest foi utilizado para a implementação dos testes unitários. Para deixar o ambiente de testes isolado, foi criado um novo arquivo Docker para a criação de três containers dedicados aos testes. Assim, haverá um banco de dados único para os testes e eles executaram de forma isolada da aplicação principal.
+O framework Jest foi utilizado para a implementação dos testes unitários. Para deixar o ambiente de testes isolado, foi criado um novo arquivo Docker para a criação de três containers dedicados aos testes. Com esses containers, um banco de dados único e isolado da aplicação será criado para os testes. Assim que os testes forem finalizados, esses containers são parados e removidos, pois não serão mais necessários.
 
 Os seguintes containers são criados ao executar os testes:
 
@@ -265,10 +265,35 @@ Os seguintes containers são criados ao executar os testes:
    - Instala as dependências necessárias (postgresql-client)
    - Executa o script de migrations (run-migrations.sh)
 3) wait_for_migrations (```api_wait_migrations```):
-   - É um container de controle que aguarda a conclusão das migrations, para garantir que os testes s'po comecem deppis que o banco de dados estiver completamente configurado.
+   - É um container de controle que aguarda a conclusão das migrations, para garantir que os testes só comecem depois que o banco de dados estiver completamente configurado.
    - Só inicia depois que o migrations_test terminar com sucesso
    - Fica em loop verificando se o arquivo migrations.done existe
    - Quando encontra o arquivo, significa que as migrations foram concluídas
+  
+Além disso, para facilitar os testes da API, a biblioteca supertest foi utilizada junto do JEST.
+  
+### Executando os testes
+
+Para executar os testes, basta rodar o seguinte comando no terminal:
+
+```bash
+npm test
+```
+Para executar os testes e mostrar a cobertura dos mesmos, o seguinte comando pode ser utilizado:
+
+```bash
+npm test -- --coverage
+```
+
+### Cobertura dos testes
+
+Os testes se encontram dentro da pasta test, e foram separados conforme os arquivos ```User.js```, ```Task.js``` e ```Auth.js```. Assim, há três arquivos de teste: ```auth.test.js```, ```task.test.js``` e ```user.test.js```.
+
+O foco principal foi testar os endpoints da API. Assim, foi testado todos os casos de sucesso dos endpoints, bem como também alguns ou todos os seus respectivos erros, seja por falta de informação ou informações incorretas inseridas pelo usuário.
+
+No final, a cobertura do código ficou da seguinte forma:
+
+
 
 ## Autores
 
