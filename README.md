@@ -1,14 +1,189 @@
 # API RESTful - Sistema de Gestão de Tarefas Colaborativas
 
-Este projeto é uma API RESTful desenvolvida para a disciplina de Engenharia de Software, implementando um sistema de gestão de tarefas colaborativas.
+Este projeto é uma API RESTful desenvolvida para a disciplina de Engenharia de Software, implementando um sistema de gestão de tarefas colaborativas. O principal objectivo desse sistema é possibilitar a criação de usuários, que poderão criar e editar tarefas, mudando seu status e conteúdo.
 
 ## Tecnologias Utilizadas
 
 - Node.js
 - Express
+- Jest
 - PostgreSQL
 - Docker
 - Make
+
+## Decisões Arquiteturiais
+
+A arquitetura em camadas foi escolhida para o desenvolvimento deste trabalho, principalmente pela facilidade do seu entendimento e pela sua similaridade com o MVC, padrão que o grupo possuía mais familiaridade. Além disso, é uma arquitetura que entrega uma boa organização e modularização do código, e facilita também a implementação de testes.
+
+As seguintes camadas foram criadas:
+
+1) Camada Routes: recebe a requisição HTTP. Nessa camada, os endpoints da API são definidos e as URLs são mapeadas para os controllers apropriados. Exemplo de código no arquivo ```routes/taskRoutes.js```:
+   ```javascript
+   router.post('/tasks', TaskController.create);
+   ```
+
+2) Camada Controllers: recebe os dados da requisição e chama os serviços apropriados. Exemplo de código no arquivo ```controllers/TaskController.js```:
+
+   ```javascript
+   const task = await TaskService.create(req.body);
+   ```
+
+3) Camada Services: faz a validação das regras de negócio e chama o respectivo repositório. Exemplo de código do arquivo ```services/TaskService.js```:
+   ```javascript
+   // Validação de negócio
+     if (!title) {
+       throw new Error('Título é obrigatório');
+     }
+   
+     const validStatuses = ['pendente', 'em_andamento', 'concluida'];
+     if (!validStatuses.includes(status)) {
+       throw new Error('Status inválido');
+     }
+   
+     // Chama o repository para criar a tarefa
+     return await this.taskRepository.create({ 
+       title, 
+       description, 
+       status 
+     });
+   ```
+
+4) Camada Repositories: executa a operação no banco de dados e converte o resultado para um objeto da camada Model. Exemplo de código do arquivo ```repositories/TaskRepository.js```:
+
+   ```javascript
+   async create({ title, description, status }) {
+     const query = `
+       INSERT INTO tasks (title, description, status)
+       VALUES ($1, $2, $3)
+       RETURNING *
+     `;
+     
+     try {
+       // 5. Executa a operação no banco de dados
+       const result = await db.query(query, [title, description, status]);
+       // 5.1. Converte o resultado para um objeto Task
+       return Task.fromDatabase(result.rows[0]);
+     } catch (error) {
+       throw error;
+     }
+   }
+   ```
+5) Camada de Models: possui o modelo de negócios. Exemplo de código do arquivo ```models/User.js```:
+
+   ```javascript
+   class User {
+     constructor({ id, name, username, password }) {
+       this.id = id;
+       this.name = name;
+       this.username = username;
+       this.password = password;
+     }
+   
+     isValid() {
+       return this.name && this.username && this.password;
+     }
+   
+     static fromDatabase(row) {
+       return new User({
+         id: row.id,
+         name: row.name,
+         username: row.username,
+         password: row.password,
+       });
+     }
+   }
+   ```
+Além disso, foi utilizado containers Dockers na arquitetura, para que seja mais fácil para o usuário executar a API desenvolvida, sem que ele precise instalar as diversas dependências. Três containers são criados inicialmente: um para o banco de dados, outro para a aplicação e um terceiro para a inicialização do banco e configurações iniciais. Esse terceiro é finalizado logo depois da sua criação e execução, então a arquitetura final fica de fato com dois containers em execução.
+
+1. **PostgreSQL** (`postgres`):
+   - Banco de dados principal
+   - Porta: 5432
+   - Credenciais padrão: postgres/postgres
+
+2. **Migrations** (`migrations`):
+   - Executa as migrations do banco de dados
+   - Roda apenas uma vez durante a inicialização
+
+3. **API** (`service`):
+   - Servidor Node.js
+   - Porta: 3000
+   - Hot-reload ativado para desenvolvimento
+
+Considerando os containers e a arquitetura em camadas, a arquitetura final ficou da seguinte forma:
+
+<div align="center">
+   <img src="https://github.com/CinthiaBecher/API-RESTful/blob/main/Arquitetura_em_camadas.png" alt="Arquitetura em camadas da API" width="300px" height="400px">
+</div>
+
+## Modelagem de Dados
+
+Haverá duas tabelas no banco de dados: uma de usuário e outra de tarefas.
+- Tabela User (usuário): essa tabela armazenará os dados do usuário, incluindo ID (chave primária), nome, username e senha.
+- Tabela Task (tarefa): essa tabela guarda as tarefas criadas e seus dados, incluindo ID (chave primária), título, descrição, status e user_ID (chave secundária que guarda o usuário atribuído à tarefa).
+
+O diagrama entidade-relacional pode ser representado da seguinte maneira:
+
+<div align="center">
+   <img src="https://github.com/CinthiaBecher/API-RESTful/blob/main/Diagrama%20ER.png" alt="Arquitetura em camadas da API" width="150px" height="400px">
+</div>
+
+## Fluxo de Requisições
+
+Dez endpoints são entregues pela API, includindo:
+
+### Autenticação
+- POST /auth/login = realiza login do usuário e retorna um token JWT. Exemplo de uso (importante criar o usuário primeiro para que o login funcione):
+
+    ```bash
+    curl -X POST http://localhost:3000/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{
+       "username": "usuario",
+       "password": "senha"
+    }'
+    ```
+
+### Usuários
+- POST /users = cria um novo usuário. Exemplo de uso:
+
+     ```bash
+     curl -X POST http://localhost:3000/users \
+     -H "Content-Type: application/json" \
+     -d '{
+        "name": "Usuário Teste",
+        "username": "usuario",
+        "password": "senha"
+     }'
+     ```
+- GET /users/{id} = obtém informações de um usuário pelo ID. Exemplo de uso:
+
+   ```bash
+   curl http://localhost:3000/users/1 \
+   -H "Authorization: Bearer seu_token_aqui"
+   ```
+
+### Tarefas
+- POST /tasks = cria uma nova tarefa. Exemplo de uso:
+
+   ```bash
+   curl -X POST http://localhost:3000/tasks \
+   -H "Authorization: Bearer seu_token_aqui" \
+   -H "Content-Type: application/json" \
+   -d '{
+      "title": "string",
+      "description": "string",
+      "status": "pendente",
+      "user_id": "string"
+   }'
+   ```
+- GET /tasks?assignedTo={id} = lista tarefas atribuídas a um usuário. Exemplo de uso:
+
+   ```bash
+   curl -X GET "http://localhost:3000/tasks?assignedTo=1" \
+   -H "Authorization: Bearer seu_token_aqui"
+   ```
+
+Esses e todos os outros endpoints entregues estão documentados utilizando o Swagger. Para entender mais sobre cada um, pode-se acessar essa documentação através da URL http://localhost:3000/api-docs/, que funcionará assim que a API for inicializada.
 
 ## Pré-requisitos
 
@@ -70,26 +245,6 @@ docker-compose down
 # Ver logs
 docker-compose logs -f
 ```
-
-
-
-## Serviços
-
-O projeto utiliza três serviços Docker:
-
-1. **PostgreSQL** (`postgres`):
-   - Banco de dados principal
-   - Porta: 5432
-   - Credenciais padrão: postgres/postgres
-
-2. **Migrations** (`migrations`):
-   - Executa as migrations do banco de dados
-   - Roda apenas uma vez durante a inicialização
-
-3. **API** (`api`):
-   - Servidor Node.js
-   - Porta: 3000
-   - Hot-reload ativado para desenvolvimento
 
 
 
