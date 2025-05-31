@@ -6,7 +6,7 @@ Este projeto é uma API RESTful desenvolvida para a disciplina de Engenharia de 
 
 - Node.js
 - Express
-- Jest
+- Jest com supertest
 - PostgreSQL
 - Docker
 - Make
