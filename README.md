@@ -10,7 +10,9 @@ Além disso, foi utilizado containers Dockers na arquitetura, para que seja mais
 
 Considerando os containers e a arquitetura em camadas, a arquitetura final ficou da seguinte forma:
 
-<img src="https://github.com/CinthiaBecher/API-RESTful/blob/main/Arquitetura_em_camadas.png" alt="Arquitetura em camadas da API" width="300px" height="400px">
+<div align="center">
+   <img src="https://github.com/CinthiaBecher/API-RESTful/blob/main/Arquitetura_em_camadas.png" alt="Arquitetura em camadas da API" width="300px" height="400px">
+</div>
 
 ## Modelagem de Dados
 
@@ -20,14 +22,67 @@ Haverá duas tabelas no banco de dados: uma de usuário e outra de tarefas.
 
 O diagrama entidade-relacional pode ser representado da seguinte maneira:
 
-<img src="https://github.com/CinthiaBecher/API-RESTful/blob/main/Diagrama%20ER.png" alt="Arquitetura em camadas da API" width="150px" height="400px">
+<div align="center">
+   <img src="https://github.com/CinthiaBecher/API-RESTful/blob/main/Diagrama%20ER.png" alt="Arquitetura em camadas da API" width="150px" height="400px">
+</div>
 
 ## Fluxo de Requisições
 
-Os seguintes endpoints são entregues na API:
+Dez endpoints são entregues pela API, includindo:
+
+### Autenticação
+- POST /auth/login = realiza login do usuário e retorna um token JWT. Exemplo de uso (importante criar o usuário primeiro para que o login funcione):
+
+    ```bash
+    curl -X POST http://localhost:3000/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{
+       "username": "usuario",
+       "password": "senha"
+    }'
+    ```
 
 ### Usuários
-- POST /users = cria um novo usuário
+- POST /users = cria um novo usuário. Exemplo de uso:
+
+     ```bash
+     curl -X POST http://localhost:3000/users \
+     -H "Content-Type: application/json" \
+     -d '{
+        "name": "Usuário Teste",
+        "username": "usuario",
+        "password": "senha"
+     }'
+     ```
+- GET /users/{id} = obtém informações de um usuário pelo ID. Exemplo de uso:
+
+   ```bash
+   curl http://localhost:3000/users/1 \
+   -H "Authorization: Bearer seu_token_aqui"
+   ```
+
+### Tarefas
+- POST /tasks = cria uma nova tarefa. Exemplo de uso:
+
+   ```bash
+   curl -X POST http://localhost:3000/tasks \
+   -H "Authorization: Bearer seu_token_aqui" \
+   -H "Content-Type: application/json" \
+   -d '{
+      "title": "string",
+      "description": "string",
+      "status": "pendente",
+      "user_id": "string"
+   }'
+   ```
+- GET /tasks?assignedTo={id} = lista tarefas atribuídas a um usuário. Exemplo de uso:
+
+   ```bash
+   curl -X GET "http://localhost:3000/tasks?assignedTo=1" \
+   -H "Authorization: Bearer seu_token_aqui"
+   ```
+
+Esses e todos os outros endpoints entregues estão documentados utilizando o Swagger. Para entender mais sobre cada um, pode-se acessar essa documentação através da URL http://localhost:3000/api-docs/, que funcionará assim que a API for inicializada.
 
 ## Tecnologias Utilizadas
 
