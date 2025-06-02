@@ -69,7 +69,7 @@ Dez endpoints são entregues pela API, includindo:
     -H "Content-Type: application/json" \
     -d '{
        "username": "usuario",
-       "password": "senha"
+       "password": "senha1"
     }'
     ```
 
@@ -82,13 +82,32 @@ Dez endpoints são entregues pela API, includindo:
      -d '{
         "name": "Usuário Teste",
         "username": "usuario",
-        "password": "senha"
+        "password": "senha1"
      }'
      ```
 - GET /users/{id} = obtém informações de um usuário pelo ID. Exemplo de uso:
 
    ```bash
    curl http://localhost:3000/users/1 \
+   -H "Authorization: Bearer seu_token_aqui"
+   ```
+- PUT /users/{id} = atualiza as informações de um usuário pelo ID. Exemplo de uso:
+  
+  ```bash
+   curl -X PUT http://localhost:3000/users/1 \
+   -H "Authorization: Bearer seu_token_aqui" \
+   -H "Content-Type: application/json" \
+   -d '{
+        "name": "Usuário Teste atualizado",
+        "username": "usuario",
+        "password": "senha1"
+     }'
+
+   ```
+- DELETE /users/{id} = deleta um usuário através do seu ID. Exemplo de uso:
+
+   ```bash
+   curl -X DELETE http://localhost:3000/users/1 \
    -H "Authorization: Bearer seu_token_aqui"
    ```
 
@@ -100,10 +119,10 @@ Dez endpoints são entregues pela API, includindo:
    -H "Authorization: Bearer seu_token_aqui" \
    -H "Content-Type: application/json" \
    -d '{
-      "title": "string",
-      "description": "string",
+      "title": "tarefa1",
+      "description": "tarefa1",
       "status": "pendente",
-      "user_id": "string"
+      "user_id": "1"
    }'
    ```
 - GET /tasks?assignedTo={id} = lista tarefas atribuídas a um usuário. Exemplo de uso:
@@ -112,8 +131,33 @@ Dez endpoints são entregues pela API, includindo:
    curl -X GET "http://localhost:3000/tasks?assignedTo=1" \
    -H "Authorization: Bearer seu_token_aqui"
    ```
+- GET /tasks/{id} = obtém informações de uma tarefa pelo seu ID. Exemplo de uso:
 
-Esses e todos os outros endpoints entregues estão documentados utilizando o Swagger. Para entender mais sobre cada um, pode-se acessar essa documentação através da URL http://localhost:3000/api-docs/, que funcionará assim que a API for inicializada.
+   ```bash
+   curl -X GET "http://localhost:3000/tasks/1" \
+   -H "Authorization: Bearer seu_token_aqui"
+   ```
+- PUT /tasks/{id} = atualiza as informações de uma tarefa pelo seu ID. Exemplo de uso:
+   ```bash
+   curl -X PUT http://localhost:3000/tasks/1 \
+   -H "Authorization: Bearer seu_token_aqui" \
+   -H "Content-Type: application/json" \
+   -d '{
+      "title": "tarefa 1 atualizada",
+      "description": "tarefa 1 atualizada",
+      "status": "pendente",
+      "user_id": "1"
+   }'
+
+   ```
+- DELETE /tasks/{id} = deleta uma tarefa através do seu ID. Exemplo de uso:
+  
+  ```bash
+   curl -X DELETE http://localhost:3000/tasks/1 \
+   -H "Authorization: Bearer seu_token_aqui"
+   ```
+
+Todos estes endpoints estão documentados utilizando o Swagger. Para entender mais sobre cada um, pode-se acessar essa documentação através da URL http://localhost:3000/api-docs/, que funcionará assim que a API for inicializada.
 
 ## Configuração e Deploy 
 
