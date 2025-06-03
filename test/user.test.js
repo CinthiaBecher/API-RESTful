@@ -5,7 +5,7 @@ describe("Testes de manipulação de usuários", () => {
   let authToken;
   let userID;
 
-  // Criar usuário e obter token antes dos testes
+  // Cria usuário e obtem token antes dos testes
   beforeAll(async () => {
     // Primeiro criar o usuário
     const createResponse = await request(app).post("/users").send({
