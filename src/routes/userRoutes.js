@@ -37,7 +37,7 @@ const authMiddleware = require("../middlewares/auth");
  *       201:
  *         description: Usuário criado com sucesso
  *       422:
- *         description: Dados inválidos
+ *         description: Campos obrigatórios não enviados
  *       400:
  *         description: Erro ao criar usuário
  */
@@ -61,8 +61,12 @@ router.post("/users", UserController.create);
  *     responses:
  *       200:
  *         description: Usuário encontrado com sucesso
+ *       401:
+ *         description: Usuário não autorizado
  *       404:
  *         description: Usuário não encontrado
+ *       400:
+ *         description: Erro ao buscar usuário
  */
 router.get("/users/:id", authMiddleware, UserController.findById);
 
@@ -101,10 +105,12 @@ router.get("/users/:id", authMiddleware, UserController.findById);
  *     responses:
  *       200:
  *         description: Usuário atualizado com sucesso
+ *       401:
+ *         description: Usuário não autorizado
  *       404:
  *         description: Usuário não encontrado
  *       422:
- *         description: Dados inválidos
+ *         description: Campos obrigatórios não enviados
  *       400:
  *         description: Erro ao atualizar usuário
  */
@@ -127,11 +133,11 @@ router.put("/users/:id", authMiddleware, UserController.update);
  *         description: ID do usuário
  *     responses:
  *       204:
- *         description: Usuário removido com sucesso (sem conteúdo)
+ *         description: Usuário deletado com sucesso 
  *       404:
  *         description: Usuário não encontrado
  *       400:
- *         description: Erro ao remover usuário
+ *         description: Erro ao deletar usuário
  */
 router.delete("/users/:id", authMiddleware, UserController.delete);
 

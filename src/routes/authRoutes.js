@@ -62,28 +62,12 @@ const AuthController = require('../controllers/AuthController');
  *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *       401:
  *         description: Senha incorreta
- *         content:
- *           application/json:
- *             example:
- *               error: Senha incorreta
  *       404:
  *         description: Usuário não encontrado
- *         content:
- *           application/json:
- *             example:
- *               error: Usuário não encontrado
  *       422:
  *         description: Campos obrigatórios não enviados
- *         content:
- *           application/json:
- *             example:
- *               error: Username e senha são obrigatórios
  *       400:
  *         description: Erro genérico na requisição
- *         content:
- *           application/json:
- *             example:
- *               error: Mensagem de erro genérica
  */
 router.post('/login', AuthController.login);
 

@@ -44,7 +44,7 @@ const authMiddleware = require("../middlewares/auth");
  *       404:
  *         description: Usuário não encontrado
  *       422:
- *         description: Dados inválidos
+ *         description: Campos obrigatórios não enviados
  *       400:
  *         description: Erro ao criar tarefa
  */
@@ -69,6 +69,8 @@ router.post("/tasks", authMiddleware, TaskController.create);
  *     responses:
  *       200:
  *         description: Lista de tarefas retornada com sucesso
+ *       401:
+ *         description: Usuário não autorizado
  *       404:
  *         description: Usuário não encontrado
  *       422:
@@ -95,7 +97,9 @@ router.get("/tasks", authMiddleware, TaskController.findByUserId);
  *         description: ID da tarefa
  *     responses:
  *       200:
- *         description: Tarefa encontrada
+ *         description: Tarefa encontrada com sucesso
+ *       401:
+ *         description: Usuário não autorizado
  *       404:
  *         description: Tarefa não encontrada
  *       400:
@@ -136,10 +140,12 @@ router.get("/tasks/:id", authMiddleware, TaskController.findById);
  *     responses:
  *       200:
  *         description: Tarefa atualizada com sucesso
+ *       401:
+ *         description: Usuário não autorizado
  *       404:
  *         description: Tarefa não encontrada
  *       422:
- *         description: Dados inválidos
+ *         description: Campos obrigatórios não enviados
  *       400:
  *         description: Erro ao atualizar tarefa
  */
