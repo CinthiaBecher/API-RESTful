@@ -88,7 +88,7 @@ Dez endpoints são entregues pela API, includindo:
 - GET /users/{id} = obtém informações de um usuário pelo ID. Exemplo de uso:
 
    ```bash
-   curl http://localhost:3000/users/1 \
+   curl -X GET http://localhost:3000/users/1 \
    -H "Authorization: Bearer seu_token_aqui"
    ```
 - PUT /users/{id} = atualiza as informações de um usuário pelo ID. Exemplo de uso:
