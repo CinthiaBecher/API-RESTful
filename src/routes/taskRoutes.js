@@ -41,6 +41,8 @@ const authMiddleware = require("../middlewares/auth");
  *     responses:
  *       201:
  *         description: Tarefa criada com sucesso
+ *      401:
+ *         description: Usuário não autorizado
  *       404:
  *         description: Usuário não encontrado
  *       422:
@@ -169,6 +171,8 @@ router.put("/tasks/:id", authMiddleware, TaskController.update);
  *     responses:
  *       204:
  *         description: Tarefa deletada com sucesso
+ *      401:
+ *         description: Usuário não autorizado
  *       404:
  *         description: Tarefa não encontrada
  *       400:

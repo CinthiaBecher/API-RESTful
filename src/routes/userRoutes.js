@@ -134,6 +134,8 @@ router.put("/users/:id", authMiddleware, UserController.update);
  *     responses:
  *       204:
  *         description: Usuário deletado com sucesso 
+ *      401:
+ *         description: Usuário não autorizado
  *       404:
  *         description: Usuário não encontrado
  *       400:
